@@ -1,13 +1,13 @@
 ---
 name: translate-missing-l10n
-description: Translate missing l10n strings for AltTab using Claude's multilingual ability. Refreshes the source `Localizable.strings` from current Swift code, finds keys missing in each `<lang>.lproj/Localizable.strings`, translates them, then writes them back via `scripts/l10n/apply_translations.ts`.
+description: Translate missing l10n strings for Switchy using Claude's multilingual ability. Refreshes the source `Localizable.strings` from current Swift code, finds keys missing in each `<lang>.lproj/Localizable.strings`, translates them, then writes them back via `scripts/l10n/apply_translations.ts`.
 ---
 
 # /translate-missing-l10n
 
 ## Project context
 
-AltTab is a macOS app that helps switch between windows, similar to the Windows alt-tab experience. The strings to translate are mostly Settings UI — some tooltips, dialogs, and general user guidance.
+Switchy is a macOS app that helps switch between windows, similar to the Windows alt-tab experience. The strings to translate are mostly Settings UI — some tooltips, dialogs, and general user guidance.
 
 ## Target languages (20)
 
@@ -18,7 +18,7 @@ AltTab is a macOS app that helps switch between windows, similar to the Windows 
 ## Translation guidelines
 
 - **Format specifiers must be preserved exactly**: `%@`, `%d`, `%1$@`, `%2$@`, `\n`, `\t`. The number and order of specifiers in the translation must match the source. Positional and unindexed forms are interchangeable (`%@ %@` ≡ `%1$@ %2$@`), but the count must match.
-- **Do not translate proper nouns**: "AltTab", "macOS", "Mission Control", "Spaces", "Dock".
+- **Do not translate proper nouns**: "Switchy", "macOS", "Mission Control", "Spaces", "Dock".
 - **Do not translate modifier key names**: "Cmd", "Option", "Alt", "Shift", "Ctrl", "Control", "Fn", "Command".
 - **Use Apple's official platform terminology** for the target locale where one exists. For example, prefer the term Apple uses in macOS System Settings for that locale ("Réglages" vs "Préférences" in French) over a literal translation.
 - **Match the source brevity**. Settings strings are short; the translation should be short too. Prefer concise, idiomatic phrasing over literal grammatical completeness.

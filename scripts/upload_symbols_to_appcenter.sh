@@ -2,14 +2,14 @@
 
 set -exu
 
-ownerName="alt-tab-macos"
-appName="alt-tab-macos"
+ownerName="switchy"
+appName="switchy"
 url="https://api.appcenter.ms/v0.1/apps/$ownerName/$appName"
 version="$(cat "$VERSION_FILE")"
 
 # Upload a single .dSYM bundle to AppCenter (zip, request slot, PUT to blob, mark committed).
 # Called once per dSYM produced by the Release build:
-#   - AltTab.app.dSYM        host binary + everything statically linked (AppCenter, AppCenterCrashes, ShortcutRecorder)
+#   - Switchy.app.dSYM        host binary + everything statically linked (AppCenter, AppCenterCrashes, ShortcutRecorder)
 #   - Sparkle.framework.dSYM Sparkle is the only .dynamic SPM product, so it has its own dSYM
 # CrashReporter.xcframework ships without dSYMs (PLCrashReporter is binary-only); AppCenter has
 # server-side symbols for it.

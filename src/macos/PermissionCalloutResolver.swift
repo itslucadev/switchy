@@ -1,6 +1,6 @@
 import Foundation
 
-/// Pure decisions for the menubar "AltTab is running without Screen Recording permissions" callout
+/// Pure decisions for the menubar "Switchy is running without Screen Recording permissions" callout
 /// (see #5623): both whether to surface it and which feature(s) it should name.
 /// `PermissionCalloutResolver` is callable in tests with no AppKit / Preferences / UserDefaults
 /// dependencies, so we can pin exactly when the callout shows vs. stays hidden and which message it

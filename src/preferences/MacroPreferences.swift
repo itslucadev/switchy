@@ -179,12 +179,12 @@ enum SpacesToShowPreference: CaseIterable, MacroPreference {
 
 enum ScreensToShowPreference: CaseIterable, MacroPreference {
     case all
-    case showingAltTab
+    case showingSwitchy
 
     var localizedString: LocalizedString {
         switch self {
             case .all: return NSLocalizedString("All screens", comment: "")
-            case .showingAltTab: return NSLocalizedString("Screen showing AltTab", comment: "")
+            case .showingSwitchy: return NSLocalizedString("Screen showing Switchy", comment: "")
         }
     }
 }

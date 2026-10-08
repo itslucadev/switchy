@@ -47,7 +47,7 @@ enum WindowEventReducer {
             // briefly around a Space transition so they aren't mistaken for real windows.
             guard !inSpaceTransition else { return [] }
             // Remember it's brand-new so its first focus event can promote it even if its app has since
-            // gone background (cmd-N spam → open AltTab: the burst's 808s land while the app is inactive).
+            // gone background (cmd-N spam → open Switchy: the burst's 808s land while the app is inactive).
             state.recentlyCreated.insert(wid)
             state.carried.lastWindowCreatedAt = now
             state.carried.lastWindowCreatedWid = wid
@@ -929,7 +929,7 @@ enum WindowEventReducer {
                 }
             }
             // Seed the ordered-in bit from the same WindowServer row this discovery was discriminated on.
-            // Without it the bit is false for every window that was already open when AltTab launched — no
+            // Without it the bit is false for every window that was already open when Switchy launched — no
             // order event ever fires for those — so tab-grouping's "an on-screen window is nobody's
             // background tab" rule would be unarmed exactly at cold start, which is when a whole desktop of
             // same-frame windows is discovered at once. Forced false for a tab we already know is in the

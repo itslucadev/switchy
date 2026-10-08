@@ -23,7 +23,7 @@ struct WsRawWindow: Equatable {
     var tags: UInt64 = 0
 }
 
-/// Pure decode of a `WsRawWindow` into the booleans AltTab's model needs. The bit/mask constants were
+/// Pure decode of a `WsRawWindow` into the booleans Switchy's model needs. The bit/mask constants were
 /// reverse-engineered live (diffing windows across states) — see `WsWindowStateSpecs.md` for the evidence.
 enum WsWindowState {
     /// `attributes` bit set while the window is on-screen / ordered-in; cleared when the window is ordered

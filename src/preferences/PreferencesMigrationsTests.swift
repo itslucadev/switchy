@@ -84,19 +84,19 @@ final class PreferencesMigrationsTests: XCTestCase {
     // MARK: - C. Language index remap (59 cases -> 21)
 
     func testLanguageRemapsKnownIndex() {
-        defaults.set("5", forKey: "language") // 5 -> 2 in the remap table
+        defaults.set("5", forKey: "language")  // 5 -> 2 in the remap table
         PreferencesMigrations.migrateLanguagePreferenceIndex()
         XCTAssertEqual(defaults.string(forKey: "language"), "2")
     }
 
     func testLanguageRemapsLastKnownIndex() {
-        defaults.set("58", forKey: "language") // 58 -> 21
+        defaults.set("58", forKey: "language")  // 58 -> 21
         PreferencesMigrations.migrateLanguagePreferenceIndex()
         XCTAssertEqual(defaults.string(forKey: "language"), "21")
     }
 
     func testLanguageRemovedLanguageFallsBackToSystemDefault() {
-        defaults.set("3", forKey: "language") // not in the table -> 0 (systemDefault)
+        defaults.set("3", forKey: "language")  // not in the table -> 0 (systemDefault)
         PreferencesMigrations.migrateLanguagePreferenceIndex()
         XCTAssertEqual(defaults.string(forKey: "language"), "0")
     }
@@ -150,14 +150,18 @@ final class PreferencesMigrationsTests: XCTestCase {
     // MARK: - F. windowTitleContains String -> [String]
 
     func testTitleArrayWrapsLegacyStringIntoArray() throws {
-        defaults.set(#"[{"bundleIdentifier":"com.x","hide":"1","ignore":"0","windowTitleContains":"abc"}]"#, forKey: "exceptions")
+        defaults.set(
+            #"[{"bundleIdentifier":"com.x","hide":"1","ignore":"0","windowTitleContains":"abc"}]"#,
+            forKey: "exceptions")
         PreferencesMigrations.migrateExceptionsTitleArray()
         let entries = try decodeExceptions()
         XCTAssertEqual(entries[0].windowTitleContains, ["abc"])
     }
 
     func testTitleArrayEmptyLegacyStringBecomesNil() throws {
-        defaults.set(#"[{"bundleIdentifier":"com.x","hide":"1","ignore":"0","windowTitleContains":""}]"#, forKey: "exceptions")
+        defaults.set(
+            #"[{"bundleIdentifier":"com.x","hide":"1","ignore":"0","windowTitleContains":""}]"#,
+            forKey: "exceptions")
         PreferencesMigrations.migrateExceptionsTitleArray()
         let entries = try decodeExceptions()
         XCTAssertNil(entries[0].windowTitleContains)
@@ -165,7 +169,9 @@ final class PreferencesMigrationsTests: XCTestCase {
 
     func testTitleArrayIsIdempotentOnAlreadyMigratedData() throws {
         // Already array form: decoding into the legacy (String?) shape fails -> early return, unchanged.
-        defaults.set(#"[{"bundleIdentifier":"com.x","hide":"1","ignore":"0","windowTitleContains":["keep"]}]"#, forKey: "exceptions")
+        defaults.set(
+            #"[{"bundleIdentifier":"com.x","hide":"1","ignore":"0","windowTitleContains":["keep"]}]"#,
+            forKey: "exceptions")
         PreferencesMigrations.migrateExceptionsTitleArray()
         let entries = try decodeExceptions()
         XCTAssertEqual(entries[0].windowTitleContains, ["keep"])
@@ -174,7 +180,7 @@ final class PreferencesMigrationsTests: XCTestCase {
     // MARK: - G. showWindowlessApps value remap
 
     func testShowWindowlessAppsOldShowAtEndBecomesTwo() {
-        defaults.set("0", forKey: "showWindowlessApps") // old showAtTheEnd (0) -> 2
+        defaults.set("0", forKey: "showWindowlessApps")  // old showAtTheEnd (0) -> 2
         PreferencesMigrations.migrateShowWindowlessApps()
         XCTAssertEqual(defaults.string(forKey: "showWindowlessApps"), "2")
     }
@@ -190,19 +196,19 @@ final class PreferencesMigrationsTests: XCTestCase {
     func testShowWindowsCheckboxTrueBecomesShow() {
         defaults.set("true", forKey: "showMinimizedWindows")
         PreferencesMigrations.migrateShowWindowsCheckboxToDropdown()
-        XCTAssertEqual(defaults.string(forKey: "showMinimizedWindows"), "0") // .show
+        XCTAssertEqual(defaults.string(forKey: "showMinimizedWindows"), "0")  // .show
     }
 
     func testShowWindowsCheckboxFalseBecomesHide() {
         defaults.set("false", forKey: "showHiddenWindows")
         PreferencesMigrations.migrateShowWindowsCheckboxToDropdown()
-        XCTAssertEqual(defaults.string(forKey: "showHiddenWindows"), "1") // .hide
+        XCTAssertEqual(defaults.string(forKey: "showHiddenWindows"), "1")  // .hide
     }
 
     // MARK: - I. Gestures split
 
     func testGesturesFourFingerRemapsToHorizontal() {
-        defaults.set("2", forKey: "nextWindowGesture") // 2 (4-finger) -> 3 (4-finger-horizontal)
+        defaults.set("2", forKey: "nextWindowGesture")  // 2 (4-finger) -> 3 (4-finger-horizontal)
         PreferencesMigrations.migrateGestures()
         XCTAssertEqual(defaults.string(forKey: "nextWindowGesture"), "3")
     }
@@ -230,7 +236,7 @@ final class PreferencesMigrationsTests: XCTestCase {
     // MARK: - K. Menubar icon hidden-value -> shown toggle
 
     func testMenubarIconHiddenValueSplitsIntoShownToggle() {
-        defaults.set("3", forKey: "menubarIcon") // 3 meant "hidden"
+        defaults.set("3", forKey: "menubarIcon")  // 3 meant "hidden"
         PreferencesMigrations.migrateMenubarIconWithNewShownToggle()
         XCTAssertEqual(defaults.string(forKey: "menubarIcon"), "0")
         XCTAssertEqual(defaults.string(forKey: "menubarIconShown"), "false")
@@ -262,7 +268,7 @@ final class PreferencesMigrationsTests: XCTestCase {
 
     func testShortcutIndexesMoveSuffix4To10AndSetCount() {
         defaults.set("X", forKey: "nextWindowGesture4")
-        defaults.set("dummy", forKey: "holdShortcut3") // a 3rd shortcut exists
+        defaults.set("dummy", forKey: "holdShortcut3")  // a 3rd shortcut exists
         PreferencesMigrations.migrateShortcutIndexes()
         XCTAssertEqual(defaults.string(forKey: "nextWindowGesture10"), "X")
         XCTAssertNil(defaults.string(forKey: "nextWindowGesture4"))
@@ -282,7 +288,8 @@ final class PreferencesMigrationsTests: XCTestCase {
     // MARK: - Helpers
 
     private func decodeExceptions() throws -> [ExceptionEntry] {
-        let raw = try XCTUnwrap(defaults.string(forKey: "exceptions"), "expected an 'exceptions' JSON string")
+        let raw = try XCTUnwrap(
+            defaults.string(forKey: "exceptions"), "expected an 'exceptions' JSON string")
         return try JSONDecoder().decode([ExceptionEntry].self, from: Data(raw.utf8))
     }
 }
@@ -323,7 +330,10 @@ struct ExceptionEntry: Codable, Equatable {
     var ignore: ExceptionIgnorePreference
     var windowTitleContains: [String]?
 
-    init(bundleIdentifier: String, hide: ExceptionHidePreference, ignore: ExceptionIgnorePreference, windowTitleContains: [String]? = nil) {
+    init(
+        bundleIdentifier: String, hide: ExceptionHidePreference, ignore: ExceptionIgnorePreference,
+        windowTitleContains: [String]? = nil
+    ) {
         self.bundleIdentifier = bundleIdentifier
         self.hide = hide
         self.ignore = ignore
@@ -340,9 +350,9 @@ enum ShowHowPreference {
 
     var indexAsString: String {
         switch self {
-            case .show: return "0"
-            case .hide: return "1"
-            case .showAtTheEnd: return "2"
+        case .show: return "0"
+        case .hide: return "1"
+        case .showAtTheEnd: return "2"
         }
     }
 }
@@ -351,10 +361,6 @@ enum ShowHowPreference {
 
 extension App {
     static let version = "99.99.99"
-}
-
-enum ProTransitionState {
-    static func markFreshInstallIfUnknown(_ value: Bool) {}
 }
 
 // Preferences codec surface used by the migrations
@@ -371,7 +377,9 @@ extension Preferences {
     // makes that migration a no-op here.
     static var allShortcutPreferenceKeys: [String] { [] }
     static func decodeShortcutStorage(_ value: Any) -> (Bool, Shortcut?) { (false, nil) }
-    static func shortcutStorage(_ shortcut: Shortcut?, _ stringRepresentation: String?) -> [String: Any] { [:] }
+    static func shortcutStorage(_ shortcut: Shortcut?, _ stringRepresentation: String?) -> [String:
+        Any]
+    { [:] }
     static func unarchiveShortcut(_ data: Data) -> (Bool, Shortcut?) { (false, nil) }
     static func shortcutFromKeyEquivalent(_ keyEquivalent: String) -> Shortcut? { nil }
 }

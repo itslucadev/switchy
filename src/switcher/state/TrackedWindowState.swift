@@ -811,7 +811,7 @@ struct WsWindowSnapshot: Equatable {
     /// don't care keep building snapshots as before. Prompt on the way in, LATE on the way out — the reducer
     /// applies the staleness rule, not the caller.
     var isMinimized: Bool = false
-    /// WindowServer compositing alpha, on the batched query AltTab already issues. `0` is one of the two
+    /// WindowServer compositing alpha, on the batched query Switchy already issues. `0` is one of the two
     /// phantom families EXACTLY (Outlook reminders, #5170/#5448), where every other route to it is an
     /// inference — and it is the family AX cannot see at all, since such a window is listed as an ordinary
     /// `AXStandardWindow`. Defaults to 1 (opaque) so a fixture that does not care decides nothing.
@@ -834,7 +834,7 @@ enum ReducerInput: Equatable {
                                 now: TimeInterval, inSpaceTransition: Bool)                  // 1325/1326
     case spaceTransitionStarted                                                              // 1329/1401, leading edge
     case spaceChangeSettled                                                                  // 1329/1401, debounced
-    /// NSWorkspace didActivateApplication (no WS equivalent). `altTabTargetWid` = a fresh AltTab-initiated
+    /// NSWorkspace didActivateApplication (no WS equivalent). `altTabTargetWid` = a fresh Switchy-initiated
     /// focus of this app, when known.
     case appActivated(pid: pid_t, now: TimeInterval, altTabTargetWid: CGWindowID?)
 
@@ -881,8 +881,8 @@ enum ReducerInput: Equatable {
     /// An AX `kAXFocusedWindow` read landed. `viaActivationRead` means the attention model requested the
     /// bounded read for a factless activation; false means the per-app discovery seed (`Window.checkIfFocused`).
     case axFocusedWindowRead(pid: pid_t, wid: CGWindowID, viaActivationRead: Bool)
-    /// AltTab focused a window of the app that is ALREADY frontmost, so no activation is coming to carry the
-    /// target (`WindowServerEvents.noteAltTabInitiatedFocus`). A namer like any other: it says which window
+    /// Switchy focused a window of the app that is ALREADY frontmost, so no activation is coming to carry the
+    /// target (`WindowServerEvents.noteSwitchyInitiatedFocus`). A namer like any other: it says which window
     /// the user asked for, and `AttentionDriver` decides what that is worth.
     case altTabFocusedWindowInFrontmostApp(wid: CGWindowID, pid: pid_t, now: TimeInterval)
     /// The bounded `kAXFocusedWindow` read an activation asked for came back with nothing — the app is wedged,
@@ -901,11 +901,11 @@ enum ReducerInput: Equatable {
     /// all includes them) — the phantom-detection pass (`Applications.applyPhantomVerdict`).
     case cgsWindowListsRead(visible: Set<CGWindowID>, all: Set<CGWindowID>, queried: Set<CGWindowID>)
     /// Screen stacking, top-most first, from the blocking CGS query the very first summon fires off-main
-    /// (`Windows.sortByLevel`). The order to fall back on for windows AltTab has never seen focused.
+    /// (`Windows.sortByLevel`). The order to fall back on for windows Switchy has never seen focused.
     case zOrderRead(widsTopFirst: [CGWindowID])
 
     /// **The attention reducer committed a decision.** The only input that may move the order: a click or
-    /// Cmd+` naming its target, AltTab's own switch, or an app answering which of
+    /// Cmd+` naming its target, Switchy's own switch, or an app answering which of
     /// its windows it considers focused. Physical events reach the model through their own cases and change
     /// visibility, geometry, membership and Space — never this.
     /// `wid` is where attention lands — the tile the user ends up on. `observed` is the window the provider

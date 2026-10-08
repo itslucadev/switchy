@@ -7,7 +7,7 @@ struct ShortcutSnapshot: Equatable {
     let keyCode: UInt32     // shortcut.carbonKeyCode
 }
 
-/// Decides which native macOS symbolic hotkeys (⌘⇥ / ⌘⇧⇥ / ⌘`) AltTab must disable vs (re-)enable
+/// Decides which native macOS symbolic hotkeys (⌘⇥ / ⌘⇧⇥ / ⌘`) Switchy must disable vs (re-)enable
 /// to make room for the configured shortcuts. Pure kernel: takes the configured shortcuts plus the
 /// set of hold-shortcut modifier flags currently in effect, returns disjoint disable/enable sets.
 ///

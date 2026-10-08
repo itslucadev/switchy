@@ -10,7 +10,7 @@ class ScreenLockEvents {
         let dnc = DistributedNotificationCenter.default()
         dnc.addObserver(self, selector: #selector(handleLocked), name: NSNotification.Name("com.apple.screenIsLocked"), object: nil, suspensionBehavior: .deliverImmediately)
         dnc.addObserver(self, selector: #selector(handleUnlocked), name: NSNotification.Name("com.apple.screenIsUnlocked"), object: nil, suspensionBehavior: .deliverImmediately)
-        // seed the state in case AltTab (re)starts while already locked, so we don't capture-storm until the first unlock
+        // seed the state in case Switchy (re)starts while already locked, so we don't capture-storm until the first unlock
         if let dict = CGSessionCopyCurrentDictionary() as? [String: Any] {
             isScreenLocked = (dict["CGSSessionScreenIsLocked"] as? Bool) ?? false
         }

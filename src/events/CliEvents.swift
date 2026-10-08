@@ -7,9 +7,9 @@ class CliEvents {
            let source = CFMessagePortCreateRunLoopSource(nil, messagePort, 0) {
             CFRunLoopAddSource(BackgroundWork.cliEventsThread.runLoop, source, .commonModes)
         } else {
-            Logger.error { "Can't listen on message port. Is another AltTab already running?" }
+            Logger.error { "Can't listen on message port. Is another Switchy already running?" }
             // TODO: should we quit or restart here?
-            // It's complex since AltTab can be restarted sometimes,
+            // It's complex since Switchy can be restarted sometimes,
             // and the new instance may coexist with the old for some duration
             // There is also the case of multiple instances at login
         }
@@ -133,7 +133,7 @@ class CliServer {
             return noOutput
         }
         // The counterpart to `--show=`, for the QA harness. `--show=` opens the switcher WITHOUT making
-        // AltTab the active app (no modifier is held, nothing activates us), and in that state Esc can
+        // Switchy the active app (no modifier is held, nothing activates us), and in that state Esc can
         // only arrive through the global cghid tap — the local monitor never sees it, because local
         // monitors only get events aimed at their own app. So a synthetic Esc is not a reliable way for
         // the harness to close what `--show=` opened, and when it failed the whole suite cascaded: the
@@ -167,7 +167,7 @@ class CliServer {
                 hideMinimized: filters.showMinimizedWindows == .hide,
                 onlyVisibleSpaces: filters.spacesToShow == .visible,
                 onlyNonVisibleSpaces: filters.spacesToShow == .nonVisible,
-                onlyPreferredScreen: filters.screensToShow == .showingAltTab,
+                onlyPreferredScreen: filters.screensToShow == .showingSwitchy,
                 separateTabs: filters.groupTabs == .separateWindows,
                 frontmostPid: frontmostPid,
                 visibleSpaceIds: visibleSpaceIds,
@@ -392,11 +392,11 @@ class CliClient {
             var returnData: Unmanaged<CFData>?
             let status = CFMessagePortSendRequest(serverPortClient, 0, data as CFData, 2, 2, CFRunLoopMode.defaultMode.rawValue, &returnData)
             guard let responseData = returnData?.takeRetainedValue() as Data?, !responseData.isEmpty else {
-                fail("AltTab did not answer \(command) (CFMessagePortSendRequest status \(status), "
+                fail("Switchy did not answer \(command) (CFMessagePortSendRequest status \(status), "
                     + "\(returnData == nil ? "no reply" : "empty reply"))")
             }
             guard let response = String(data: responseData, encoding: .utf8) else {
-                fail("AltTab's answer to \(command) is \(responseData.count) bytes that are not text")
+                fail("Switchy's answer to \(command) is \(responseData.count) bytes that are not text")
             }
             guard response != "\"\(CliServer.error)\"" else {
                 fail("Couldn't execute command. Is it correct?")
@@ -406,7 +406,7 @@ class CliClient {
             }
             exit(0)
         } catch {
-            fail("AltTab.app needs to be running for CLI commands to work")
+            fail("Switchy.app needs to be running for CLI commands to work")
         }
     }
 

@@ -4,8 +4,8 @@
 
 ## Summary
 
-The Settings window has its own search box that filters + highlights matching controls. Two pieces make
-that work and are pinned here:
+The settings search box filters sidebar destinations and highlights the selected page and open
+settings sheets. The following mechanisms preserve matching content across page changes:
 
 - **Highlight targets** — a matched row reports whether the query matches its label and, if so, paints
   the search-match color over the matched range (and clears back to plain when the query changes). Works
@@ -40,4 +40,6 @@ Mirrors `SettingsSearchHighlightTests.swift` 1:1.
 
 ### Tier B — factory ⇄ index registration wiring
 - **testMakeTextRegistersStringAndTargetInActiveBuilder** — `makeText` pushes its string + target into the active builder (the regression guard).
-- **testMakeTextOutsideIndexedScopeDoesNotCrashOrLeak** — with no active builder, `makeText` silently no-ops.
+- **testMakeTextOutsideIndexedScopeDoesNotCrashOrLeak**: with no active builder, `makeText` silently no-ops.
+- **testSidebarRowRegistersCurrentTitleAndSummary**: both the current row title and summary are searchable and highlightable.
+- **testSidebarRowTargetsFollowReusedRowContent**: registered targets read reused rows' current labels without stale matches.

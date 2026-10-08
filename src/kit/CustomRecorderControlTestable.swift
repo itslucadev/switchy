@@ -184,7 +184,7 @@ enum ShortcutAcceptance: Equatable {
         }
     }
 }
-/// Hard-set Force-Quit chords. macOS reserves these and they cannot be unbound, so AltTab refuses
+/// Hard-set Force-Quit chords. macOS reserves these and they cannot be unbound, so Switchy refuses
 /// to assign them. (`⌘⎋` was previously listed here for Game Overlay; it's been removed because
 /// the cghid event tap in `KeyboardEvents` intercepts at HID level, before Game Overlay's hook —
 /// see #5585.)

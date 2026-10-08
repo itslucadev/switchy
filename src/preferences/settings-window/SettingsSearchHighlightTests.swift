@@ -1,5 +1,5 @@
-import XCTest
 import Cocoa
+import XCTest
 
 /// Coverage for the settings-search *highlight* machinery — the layer that turns a query match
 /// into yellow-highlighted text on a specific control.
@@ -15,9 +15,8 @@ import Cocoa
 ///      for the sidebar) must *register* that target into the active `SettingsSearchIndex.Builder`,
 ///      so a section's search actually drives it. (Tier B: factory ⇄ index wiring.)
 ///
-/// The sidebar rows feed `NSTextField` labels into `highlightTarget`; the rounded-section rows
-/// feed `LightLabel`. Both overloads are covered. (`SidebarListRow` itself — and its Pro-badge
-/// recycling — is covered separately in `SidebarListTests`; it compiles into this target fine.)
+/// Sidebar rows supply NSTextField targets and rounded-section rows supply LightLabel targets.
+/// The tests cover both label types and the sidebar row's live-text registration.
 final class SettingsSearchHighlightTests: XCTestCase {
 
     // MARK: - Tier A: NSTextField highlight target (what sidebar rows use)
@@ -25,18 +24,25 @@ final class SettingsSearchHighlightTests: XCTestCase {
     func testTextFieldTargetReportsMatch() {
         let tf = NSTextField(labelWithString: "Shortcut 1")
         guard let target = SettingsSearchHighlight.highlightTarget(tf) else {
-            return XCTFail("a non-empty label must produce a highlight target — sidebar rows rely on this to be searchable")
+            return XCTFail(
+                "a non-empty label must produce a highlight target — sidebar rows rely on this to be searchable"
+            )
         }
-        XCTAssertTrue(target.hasMatch("Sho"),
-            "regression: a prefix query must match the label text — this is exactly the 'typing sho doesn't highlight Shortcut N' bug")
-        XCTAssertFalse(target.hasMatch("zzz"),
+        XCTAssertTrue(
+            target.hasMatch("Sho"),
+            "regression: a prefix query must match the label text — this is exactly the 'typing sho doesn't highlight Shortcut N' bug"
+        )
+        XCTAssertFalse(
+            target.hasMatch("zzz"),
             "a non-matching query must not report a match")
     }
 
     func testTextFieldTargetIsNilForEmptyLabel() {
         let tf = NSTextField(labelWithString: "")
-        XCTAssertNil(SettingsSearchHighlight.highlightTarget(tf),
-            "an empty label has nothing to highlight, so the factory returns nil (the index skips it)")
+        XCTAssertNil(
+            SettingsSearchHighlight.highlightTarget(tf),
+            "an empty label has nothing to highlight, so the factory returns nil (the index skips it)"
+        )
     }
 
     func testTextFieldHighlightAppliesSearchColorToMatchedRange() {
@@ -50,29 +56,36 @@ final class SettingsSearchHighlightTests: XCTestCase {
         XCTAssertEqual(attr.string, "Shortcut 1")
         var matchedRangeHasColor = false
         var tailHasColor = false
-        attr.enumerateAttribute(.foregroundColor, in: NSRange(location: 0, length: attr.length)) { value, range, _ in
+        attr.enumerateAttribute(.foregroundColor, in: NSRange(location: 0, length: attr.length)) {
+            value, range, _ in
             guard value as? NSColor == Appearance.searchMatchForegroundColor else { return }
             if range.location == 0, range.length == 3 { matchedRangeHasColor = true }
             if range.location >= 3 { tailHasColor = true }
         }
-        XCTAssertTrue(matchedRangeHasColor,
+        XCTAssertTrue(
+            matchedRangeHasColor,
             "regression: the matched prefix must be tinted with the search-match color")
-        XCTAssertFalse(tailHasColor,
-            "regression: only the matched range may be tinted — tinting the whole string is the bug that froze the boldness/color on the wrong selection")
+        XCTAssertFalse(
+            tailHasColor,
+            "regression: only the matched range may be tinted — tinting the whole string is the bug that froze the boldness/color on the wrong selection"
+        )
     }
 
     func testTextFieldHighlightClearsBackToPlain() {
         let tf = NSTextField(labelWithString: "Shortcut 1")
         let target = SettingsSearchHighlight.highlightTarget(tf)!
-        target.updateHighlight("Sho")   // apply
-        target.updateHighlight("zzz")   // no match → clears
+        target.updateHighlight("Sho")  // apply
+        target.updateHighlight("zzz")  // no match → clears
         let attr = tf.attributedStringValue
         var anyColor = false
-        attr.enumerateAttribute(.foregroundColor, in: NSRange(location: 0, length: attr.length)) { value, _, _ in
+        attr.enumerateAttribute(.foregroundColor, in: NSRange(location: 0, length: attr.length)) {
+            value, _, _ in
             if value as? NSColor == Appearance.searchMatchForegroundColor { anyColor = true }
         }
-        XCTAssertFalse(anyColor,
-            "after a non-matching query the highlight must be fully cleared so no stale yellow text remains")
+        XCTAssertFalse(
+            anyColor,
+            "after a non-matching query the highlight must be fully cleared so no stale yellow text remains"
+        )
     }
 
     // MARK: - Tier A: LightLabel highlight target (what rounded-section rows use)
@@ -84,10 +97,13 @@ final class SettingsSearchHighlightTests: XCTestCase {
         }
         XCTAssertTrue(target.hasMatch("Group"))
         target.updateHighlight("Group")
-        XCTAssertEqual(label.highlightRanges, [NSRange(location: 0, length: 5)],
-            "regression: LightLabel must receive the matched range so it can draw the yellow background inline on its next draw")
+        XCTAssertEqual(
+            label.highlightRanges, [NSRange(location: 0, length: 5)],
+            "regression: LightLabel must receive the matched range so it can draw the yellow background inline on its next draw"
+        )
         target.updateHighlight("zzz")
-        XCTAssertTrue(label.highlightRanges.isEmpty,
+        XCTAssertTrue(
+            label.highlightRanges.isEmpty,
             "a non-matching query must clear the LightLabel's highlight ranges")
     }
 
@@ -103,11 +119,15 @@ final class SettingsSearchHighlightTests: XCTestCase {
             TableGroupView.makeText("Order windows by")
         }
         XCTAssertEqual(label.stringValue, "Order windows by")
-        XCTAssertTrue(builder.strings.contains("Order windows by"),
+        XCTAssertTrue(
+            builder.strings.contains("Order windows by"),
             "regression: makeText must register its label string into the active search index")
-        XCTAssertEqual(builder.targets.count, 1,
-            "regression: makeText must register exactly one highlight target — without it the label is searchable-by-string but never lights up")
-        XCTAssertTrue(builder.targets.first?.hasMatch("Order") ?? false,
+        XCTAssertEqual(
+            builder.targets.count, 1,
+            "regression: makeText must register exactly one highlight target — without it the label is searchable-by-string but never lights up"
+        )
+        XCTAssertTrue(
+            builder.targets.first?.hasMatch("Order") ?? false,
             "the registered target must actually match the label's text")
     }
 
@@ -117,7 +137,34 @@ final class SettingsSearchHighlightTests: XCTestCase {
     func testMakeTextOutsideIndexedScopeDoesNotCrashOrLeak() {
         SettingsSearchIndex.current = nil
         let label = TableGroupView.makeText("Theme")
-        XCTAssertEqual(label.stringValue, "Theme",
-            "makeText must still build the label when no builder is active; registration just no-ops")
+        XCTAssertEqual(
+            label.stringValue, "Theme",
+            "makeText must still build the label when no builder is active; registration just no-ops"
+        )
+    }
+
+    func testSidebarRowRegistersCurrentTitleAndSummary() {
+        let row = SidebarListRow(frame: .zero)
+        row.setContent("Shortcut 4", "Show windows from current app")
+        let (_, builder) = SettingsSearchIndex.indexed {
+            row.registerSearchContent()
+        }
+        XCTAssertTrue(builder.strings.contains("Shortcut 4"))
+        XCTAssertTrue(builder.strings.contains("Show windows from current app"))
+        XCTAssertTrue(builder.targets.contains { $0.hasMatch("Shortcut 4") })
+        XCTAssertTrue(builder.targets.contains { $0.hasMatch("current app") })
+    }
+
+    func testSidebarRowTargetsFollowReusedRowContent() {
+        let row = SidebarListRow(frame: .zero)
+        row.setContent("Shortcut 4", "Show windows from current app")
+        let (_, builder) = SettingsSearchIndex.indexed {
+            row.registerSearchContent()
+        }
+        row.setContent("Shortcut 5", "Show all windows")
+        XCTAssertTrue(builder.targets.contains { $0.hasMatch("Shortcut 5") })
+        XCTAssertTrue(builder.targets.contains { $0.hasMatch("all windows") })
+        XCTAssertFalse(builder.targets.contains { $0.hasMatch("Shortcut 4") })
+        XCTAssertFalse(builder.targets.contains { $0.hasMatch("current app") })
     }
 }

@@ -3,10 +3,10 @@ import Foundation
 /// Detects whether a window is a "phantom": present in macOS APIs (AX hands it back with a valid
 /// `CGWindowID`) but not something the app actually means to show the user — alpha=0 Outlook reminders,
 /// `orderOut:` / `show:false` Electron windows, WeChat/Teams hidden windows, etc. The pixel content may
-/// be absent, black, or anything; what matters is that AltTab shouldn't offer it as a switch target.
+/// be absent, black, or anything; what matters is that Switchy shouldn't offer it as a switch target.
 ///
 /// **Two exact WindowServer facts, not two inferences.** There are exactly two phantom families, and the
-/// batched query AltTab already issues states both of them outright:
+/// batched query Switchy already issues states both of them outright:
 ///
 /// | family | producer | the fact |
 /// |---|---|---|

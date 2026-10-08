@@ -1,4 +1,4 @@
-You can [suggest an enhancement or discuss an issue on github](https://github.com/lwouis/alt-tab-macos/issues), or use the feedback form in the app.
+You can [suggest an enhancement or discuss an issue on github](https://github.com/itslucadev/switchy/issues), or use the feedback form in the app.
 
 ## Technical overview
 
@@ -9,7 +9,7 @@ This document gives a technical overview of the project, for newcomers who want 
 This project has minimal dependency on Xcode-only features (e.g. InterfaceBuilder, Playgrounds). You can build it by doing:
 
 * `scripts/codesign/setup_local.sh` to generate a local self-signed certificate, to avoid having to re-check the `System Preferences > Security & Privacy` permissions on every build
-* Either open `alt-tab-macos.xcodeproj` with Xcode, or use the CLI: `xcodebuild -project alt-tab-macos.xcodeproj -scheme Debug` to build the .app with the `Debug` build configuration
+* Either open `switchy.xcodeproj` with Xcode, or use the CLI: `xcodebuild -project switchy.xcodeproj -scheme Debug` to build the .app with the `Debug` build configuration
 
 ## Mac development
 
@@ -21,7 +21,7 @@ Documentation is abysmal. Very simple things are not documented at all, and good
 
 Dependencies in this project are vendored under `vendor/` and consumed as local Swift Package Manager packages. Each dependency has an `update_*.sh` script under `vendor/scripts/` that re-fetches it from upstream, strips unused files, and regenerates its `Package.swift`. There is no remote dependency resolution at build time — `git clone && xcodebuild` is the full bootstrap.
 
-OS APIs are quite limited for the kind of low-level, system-wide app AltTab is. This means often we just don’t have an API to do something. For instance, there is no API to ask the OS “how many Spaces does the user have?” or “Can you focus the window on Space 2?”. There are however, retro-engineered private APIs which you can call. These are not documented at all, not guaranteed to be there in future macOS releases, and prevent us from releasing AltTab on the Mac AppStore. We have tried our best to [document the ones we are using](https://github.com/lwouis/alt-tab-macos/blob/master/src/macos/api-wrappers/README.md).
+OS APIs are quite limited for the kind of low-level, system-wide app Switchy is. This means often we just don’t have an API to do something. For instance, there is no API to ask the OS “how many Spaces does the user have?” or “Can you focus the window on Space 2?”. There are however, retro-engineered private APIs which you can call. These are not documented at all, not guaranteed to be there in future macOS releases, and prevent us from releasing Switchy on the Mac AppStore. We have tried our best to [document the ones we are using](https://github.com/lwouis/alt-tab-macos/blob/master/src/macos/api-wrappers/README.md).
 
 ## Project architecture
 
@@ -29,8 +29,8 @@ To mitigate the issues listed above, we took some measures.
 
 We minimize reliance on XCode, InterfaceBuilder, Playground, and other GUI tools. You can’t cut the dependency completely though as only XCode can build macOS apps. The whole UI, including the menubar, is built in code (no xib). Currently, the project has these files:
 
-* `alt-tab-macos.xcodeproj` file describing AltTab itself. It contains some settings for the app
-* `alt_tab_macos.entitlements` and `Info.plist` which are static files describing some app config for XCode
+* `switchy.xcodeproj` file describing Switchy itself. It contains some settings for the app
+* `switchy.entitlements` and `Info.plist` which are static files describing some app config for XCode
 * `vendor/` holds vendored open-source libraries (Sparkle, ShortcutRecorder, AppCenter) as local SPM packages. `vendor/scripts/update_*.sh` refresh them from upstream
 * Some `.xcconfig` files in `config/` which contain XCode settings that people typically change using XCode UI, but that I want to be version controlled
 
@@ -53,21 +53,24 @@ The `src/` folder groups files by feature, so files that change together live to
 | `src/windowserver/`     | the WindowServer event pipeline feeding the list of windows |
 | `src/events/`           | incoming events we listen to (keyboard, mouse, cursor, Dock, AX queries, etc.) |
 | `src/macos/`            | wrappers around macOS APIs (AX/CGS call schedulers, permissions, login item); `src/macos/api-wrappers/` holds the retro-engineered private-API signatures |
-| `src/preferences/`      | user settings: storage, migrations, and the Settings window |
-| `src/pro/`              | the paid "Pro" features (license, scheduling, related UI) |
+| `src/preferences/`      | user settings: storage, migrations, and the Settings window (four pages: Appearance, Controls, General, Exceptions) |
 | `src/secondary-windows/`| windows other than the switcher (feedback, permission, debug) |
 | `src/kit/`              | reusable AppKit building blocks (custom buttons, views, controls) |
 | `src/util/`             | generic helpers (background work, throttling, scheduling policy) |
-| `src/api/`              | client for our backend (license and feedback endpoints) |
+| `src/api/`              | client for our backend (feedback endpoint) and the site/appcast URLs |
 | `src/vendors/`          | glue code for vendored libraries (AppCenter, Sparkle, ObjC exception catcher) |
-| `src/debug/`            | benchmarking and QA tooling |
+| `src/debug/`            | benchmarking tooling |
 | `src/_test-support/`    | mocks and helpers shared by the unit tests |
 
 Other folders/files are either tooling or auto-generated (e.g. `DerivedData/` is generated by Xcode builds).
 
+This is a private, unlicensed build of Switchy: every feature is available unconditionally, with no Pro tier, trial, or license activation.
+
+The Settings window has four pages (Appearance, Controls, General, Exceptions) and opens only from the menu; nothing opens it automatically.
+
 ## QA
 
-**alt-tab-macos** is deeply integrated with the OS and other apps. Thus doing end-to-end automated QA would be a nightmare. For the time being QA is done manually.
+**switchy** is deeply integrated with the OS and other apps. Thus doing end-to-end automated QA would be a nightmare. For the time being QA is done manually.
 
 In an attempt to not have too many regressions, this documents will list OS interactions. This should be useful as some of them are very exotic and not many people know about them.
 
@@ -103,9 +106,9 @@ In an attempt to not have too many regressions, this documents will list OS inte
 * Long titles should be truncated
 * Many windows are opened
 * There is no open window
-* AltTab should appear on top of all windows, dialogs, pop-overs, the Dock, etc
+* Switchy should appear on top of all windows, dialogs, pop-overs, the Dock, etc
 
-### OS events to handle while AltTab’s UI is shown
+### OS events to handle while Switchy’s UI is shown
 
 * An app is launching/quitting
 * A new window opens
@@ -120,9 +123,9 @@ In an attempt to not have too many regressions, this documents will list OS inte
 
 * General > Appearance > "Dark": switches to Dark Mode
 * General > Accent color > "Graphite": traffic lights on thumbnails should be gray
-* Accessibility > Display > Reduce transparency: AltTab background should be a solid color
+* Accessibility > Display > Reduce transparency: Switchy background should be a solid color
 * General > Show scroll bars > "Always": regenerates all scrollbars
-* Display > Resolution > Scaled: changes DPI and rescale AltTab
+* Display > Resolution > Scaled: changes DPI and rescale Switchy
 * Mission Control > "Displays have separate Spaces": changes Spaces behavior on multi-displays setups
 
 ### Spaces
@@ -140,14 +143,14 @@ In an attempt to not have too many regressions, this documents will list OS inte
 * The "select next window" shortcut can be modifiers, modifiers+key, or just key; it can also contain the same modifiers as the hold "key"
 * All shortcuts, except the hold key, can be disabled by the user
 * Shortcuts can include the `escape` and `delete` key; these should not stop recording shortcuts
-* [Secure Input](https://github.com/lwouis/alt-tab-macos/issues/157#issuecomment-659170293) can prevent AltTab from listening to the keyboard
-* Some shortcuts should only work when AltTab is open
+* [Secure Input](https://github.com/lwouis/alt-tab-macos/issues/157#issuecomment-659170293) can prevent Switchy from listening to the keyboard
+* Some shortcuts should only work when Switchy is open
   * These shortcuts should active whether the hold shortcut is held or not
 * Shortcuts should work with capslock active or inactive
 * Shortcuts should repeat if kept pressed
   * Repeat rate and initial delay should match the values set in `System Preference` > `Keyboard`
   * when navigating left/right/up/down, the repeating behavior should stop when hitting the last window in the list. The user can then manually do the shortcut once more to cycle to the other side; it then repeats again
-* The shortcut sets 1 and 2 should not interact with each other (e.g. opening AltTab with one, then using the other to navigate)
+* The shortcut sets 1 and 2 should not interact with each other (e.g. opening Switchy with one, then using the other to navigate)
 * Shortcuts can focus the window on release, or be pressing a key or using the mouse
 * Keyboards from other countries have different layout which impact shortcuts
   * e.g. the default ``` ⌥` ``` shortcut should become `⌥<` on a Spanish ISO keyboard
@@ -161,6 +164,6 @@ In an attempt to not have too many regressions, this documents will list OS inte
 
 ### Misc
 
-* AltTab is launched after some apps/windows are already opened
-* Displays/mouses/trackpads/keyboards get connected/disconnected while AltTab is used
+* Switchy is launched after some apps/windows are already opened
+* Displays/mouses/trackpads/keyboards get connected/disconnected while Switchy is used
 * Sudden Termination

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Build phase script for the alt-tab-macos target. Wired from the "Copy Sparkle Helpers"
+# Build phase script for the switchy target. Wired from the "Copy Sparkle Helpers"
 # build phase via $(SRCROOT)/scripts/copy_sparkle_helpers.sh.
 #
-# Runs after Xcode's Embed Frameworks phase, before Xcode's final code-signing of AltTab.app:
+# Runs after Xcode's Embed Frameworks phase, before Xcode's final code-signing of Switchy.app:
 #   1. Copy Sparkle's prebuilt Updater.app + Autoupdate (already Developer ID-signed at
 #      vendor time by vendor/scripts/update_sparkle.sh) into Sparkle.framework/Versions/A/,
 #      AND add the top-level Sparkle.framework/Autoupdate and /Updater.app symlinks. Sparkle's
@@ -100,7 +100,7 @@ done
 # rewrite + the helper/resource copies above. We don't have to sign Updater.app / Autoupdate —
 # those are pre-signed with the maintainer's Developer ID at vendor time (see
 # vendor/scripts/update_sparkle.sh) and their seals deeper than --deep walks, so Xcode's final
-# pass on AltTab.app never touches them.
+# pass on Switchy.app never touches them.
 # Why this can't be Xcode's --deep alone: Release adds --deep via release.xcconfig and Xcode does
 # re-seal Sparkle.framework, but Debug uses --timestamp=none without --deep, leaving the SPM
 # linker-signed adhoc seal in place — which then fails `codesign --verify --deep --strict`

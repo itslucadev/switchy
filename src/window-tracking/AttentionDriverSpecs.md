@@ -8,8 +8,8 @@ The translation is the architecture. The reducer's vocabulary is shaped by where
 model's by what it says about the user. Four groups:
 
 - **a plain activation names an app and nothing else** — `frontProcessChanged`, never a window; an activation
-  carrying AltTab's own target is already a window namer and needs no read
-- **a namer names a window of one app** — the click, AltTab's own switch, and the app answering about itself
+  carrying Switchy's own target is already a window namer and needs no read
+- **a namer names a window of one app** — the click, Switchy's own switch, and the app answering about itself
 - **an app failing to answer names nothing, and says so** — the bounded read coming back empty is
   `focusedWindowUnknown`, which is a value rather than a silence
 - **everything else names nothing** — the WindowServer's order and focus family, geometry, Spaces, discovery,
@@ -41,7 +41,7 @@ model's by what it says about the user. Four groups:
   it through the current tab mapping on activation, rather than retaining a stale representative.
 - **testAClickFrontsItsWindowWithoutWaitingForTheActivation** — the click names both levels at once, so it
   fronts a window of an app that has not activated yet. The only source that survives a wedged app.
-- **testAnActivationCarryingAnAltTabTargetFrontsIt** — our own switch names its target.
+- **testAnActivationCarryingASwitchyTargetFrontsIt** — our own switch names its target.
 - **testAnAnswerMapsThroughTheTabRepresentative** — an app answering with a background tab moves the tile that
   stands for it, while the wid the app actually named is reported alongside.
 - **testAnAppThatCannotAnswerMovesNothing** — unknown is a value. The bounded read coming back empty is
@@ -49,7 +49,7 @@ model's by what it says about the user. Four groups:
 
 ### C. Process generations and ordering
 
-- **testUnseenPidIsRegisteredBeforeItsEvent** — an app already running when AltTab started answers normally
+- **testUnseenPidIsRegisteredBeforeItsEvent** — an app already running when Switchy started answers normally
   rather than as a stale generation.
 - **testRelaunchedPidDoesNotInheritTheDeadProcessesFact** — a relaunched pid starts with no fact, so its first
   activation asks for a read instead of landing on the dead process's window.
@@ -70,7 +70,7 @@ model's by what it says about the user. Four groups:
 
 ## Seeding the front process
 
-The model learns which app is in front from activations. An app that was already frontmost when AltTab
+The model learns which app is in front from activations. An app that was already frontmost when Switchy
 started produced none, so every answer it gave was about a process the model did not think was in front, and
 Cmd+` inside it moved nothing. `syncFrontmost` reads the front app from the model of the world before
 translating an answer, which is a correction rather than a claim about the user.

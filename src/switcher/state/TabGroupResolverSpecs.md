@@ -3,7 +3,7 @@
 ## Summary
 
 `TabGroupResolver` holds the pure decisions behind macOS **OS-tab** detection — deciding which windows are
-inactive tabs of one tabbed window, given the facts AltTab can read. macOS exposes no public API that maps
+inactive tabs of one tabbed window, given the facts Switchy can read. macOS exposes no public API that maps
 an inactive tab to its window: `_AXUIElementGetWindow` on an AXTabButton returns the *parent* window's WID,
 not the tab's own, so tabs must be matched to windows **by title**. Inactive tabs also appear in no CGS
 list, so the WindowServer-driven

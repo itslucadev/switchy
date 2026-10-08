@@ -1,8 +1,8 @@
 import Foundation
 
-/// Pure decision layer for "can AltTab actually persist its preferences to disk?".
+/// Pure decision layer for "ca Switchy actually persist its preferences to disk?".
 ///
-/// AltTab stores prefs via `UserDefaults`/`CFPreferences`, which `cfprefsd` brokers. cfprefsd keeps values
+/// Switchy stores prefs via `UserDefaults`/`CFPreferences`, which `cfprefsd` brokers. cfprefsd keeps values
 /// in memory and flushes them to `~/Library/Preferences/<suite>.plist` on its own schedule, so a setting can
 /// look applied in-process yet never reach disk and silently reset on the next launch (issue #5790). Two
 /// concrete, observable conditions guarantee non-persistence on every supported macOS:

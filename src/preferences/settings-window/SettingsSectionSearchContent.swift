@@ -1,18 +1,13 @@
 import Cocoa
 
-/// A Settings section's searchable content, split into a fixed **base** captured during the
-/// section's build-time `SettingsSearchIndex.indexed { }` scope and a replaceable **dynamic** part
-/// for content that is rebuilt while the section is already live.
+/// A settings page's searchable content, split into a fixed base captured during its build-time
+/// `SettingsSearchIndex.indexed { }` scope and a replaceable dynamic part for rebuilt sidebar rows.
+/// The index remains available even while the page is detached from the document view.
 ///
-/// Why the split exists: most controls are built once, so the push-based index harvested at build
-/// time stays valid for the session. But ControlsTab's shortcut sidebar rows ("Shortcut 1",
-/// "Shortcut 2", …) are torn down and recreated by `refreshShortcutRows` — which runs *outside* the
-/// build scope (via `preferenceChanged`, the +/- buttons, input-source changes, the pro-lock
-/// observer, …). Their inline `registerSearchContent` no-ops there (no active builder), and the
-/// section's base targets keep pointing at the now-removed labels, so a query like "sho" stopped
-/// lighting up the rebuilt rows. Sections that manage such rows skip them in the build-time walk
-/// (so they never land in `base`) and re-publish them here via `setDynamic` after every rebuild —
-/// a wholesale swap that leaves no stale targets behind and makes freshly-added rows searchable.
+/// ControlsTab's shortcut rows are refreshed outside the build-time scope by preference changes,
+/// the +/- buttons, and input-source changes. Their inline registration has no active builder,
+/// so retaining build-time row targets would leave removed labels in the index. Sections with
+/// such rows skip them in the build-time walk and replace their dynamic content after each rebuild.
 final class SettingsSectionSearchContent {
     private let baseStrings: [String]
     private let baseTargets: [SettingsSearchHighlightTarget]
@@ -36,11 +31,13 @@ final class SettingsSectionSearchContent {
     var searchableStrings: [String] { baseStrings + dynamicStrings }
     var highlightTargets: [SettingsSearchHighlightTarget] { baseTargets + dynamicTargets }
 
-    /// True when the query is empty (everything matches) or any base/dynamic string or highlight
-    /// target matches it. Drives whether the section stays visible in filtered search results.
+    /// True when the query is empty or any base/dynamic string or highlight target matches it.
+    /// Determines whether this page remains available in the filtered sidebar, not whether it is mounted.
     func matches(_ query: String) -> Bool {
         if SettingsSearch.isQueryEmpty(query) { return true }
-        if searchableStrings.contains(where: { SettingsSearch.match(query, in: $0) != nil }) { return true }
+        if searchableStrings.contains(where: { SettingsSearch.match(query, in: $0) != nil }) {
+            return true
+        }
         return highlightTargets.contains { $0.hasMatch(query) }
     }
 

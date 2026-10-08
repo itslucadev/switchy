@@ -70,11 +70,18 @@ final class SwitcherSession {
 
     /// Full-resolution frames for the Preview panel, fetched just-in-time for the selected window and
     /// its cycling neighbors (`WindowThumbnails.fetchPreviewFrames`, #5861). Living on the session, they
-    /// are released wholesale when it ends, so idle RAM only holds thumbnail-scale images. Capped +
-    /// least-recently-used-evicted so a long session arrow-keying through many windows stays bounded.
+    /// are released wholesale when it ends, so idle RAM only holds thumbnail-scale images. Count-capped
+    /// at 10 and byte-capped at 64 MiB, least-recently-used-evicted; a single selected frame may exceed
+    /// 64 MiB because it still has to display.
     private static let maxPreviewFrames = 10
+    private static let maxPreviewBytes: UInt64 = 64 * 1024 * 1024
     private var previewFrames = [CGWindowID: CALayerContents]()
-    private var previewFramesLru = [CGWindowID]() // most recently used last
+    private var previewFramesLru = [CGWindowID]()  // most recently used last
+    private var previewFramesBytes: UInt64 = 0
+
+    /// The selected Preview window, including while its full-resolution capture is pending. Eviction
+    /// must skip it so neighbor prefetch cannot expose a late thumbnail refresh.
+    var pinnedPreviewWid: CGWindowID?
 
     func hasPreviewFrame(_ wid: CGWindowID) -> Bool { previewFrames[wid] != nil }
 
@@ -86,11 +93,38 @@ final class SwitcherSession {
     }
 
     func storePreviewFrame(_ wid: CGWindowID, _ frame: CALayerContents) {
+        if let old = previewFrames[wid] {
+            subtractPreviewBytes(old.byteSize)
+        }
         previewFrames[wid] = frame
+        addPreviewBytes(frame.byteSize)
         previewFramesLru.removeAll { $0 == wid }
         previewFramesLru.append(wid)
-        if previewFramesLru.count > Self.maxPreviewFrames {
-            previewFrames.removeValue(forKey: previewFramesLru.removeFirst())
+        evictPreviewFramesIfNeeded()
+    }
+
+    private func addPreviewBytes(_ n: UInt64) {
+        let (sum, overflow) = previewFramesBytes.addingReportingOverflow(n)
+        previewFramesBytes = overflow ? UInt64.max : sum
+    }
+
+    private func subtractPreviewBytes(_ n: UInt64) {
+        previewFramesBytes = previewFramesBytes < n ? 0 : previewFramesBytes - n
+    }
+
+    private func evictPreviewFramesIfNeeded() {
+        while previewFramesLru.count > 1
+            && (previewFramesLru.count > Self.maxPreviewFrames
+                || previewFramesBytes > Self.maxPreviewBytes)
+        {
+            // the pinned frame is skipped (testPinnedSelectedFrameSurvivesByteBudgetEviction); when only
+            // it remains the loop stops, so an oversized pinned frame still survives both caps
+            guard let evicted = previewFramesLru.first(where: { $0 != pinnedPreviewWid }) else {
+                break
+            }
+            previewFramesLru.removeAll { $0 == evicted }
+            guard let evictedFrame = previewFrames.removeValue(forKey: evicted) else { continue }
+            subtractPreviewBytes(evictedFrame.byteSize)
         }
     }
 }

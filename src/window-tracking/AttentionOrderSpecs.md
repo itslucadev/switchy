@@ -6,7 +6,7 @@ One engine decides which window the user is looking at: `AttentionModel`, fed by
 ## The whole system, in one place
 
     NSWorkspace activation ─┐
-    AltTab's own switch ────┼─→ TrackedWindowStateBridge.dispatch ─→ AttentionEngine.dispatched ─┐
+    Switchy's own switch ────┼─→ TrackedWindowStateBridge.dispatch ─→ AttentionEngine.dispatched ─┐
     factless kAXFocusedWindow read ┘                                                              │
                                                                                                  │
     the app's AXObserver ─→ AxObserverRegistry ─→ AttentionEngine.axSemanticFocus (60ms settle) ─┤
@@ -25,7 +25,7 @@ One engine decides which window the user is looking at: `AttentionModel`, fed by
 - **`AttentionDriver`** translates the reducer's vocabulary into the model's, and allocates arrival
   sequences (`AttentionDriverSpecs.md`).
 - **`AttentionEngine`** is the impure shell: process generations, the per-process settle, the commit.
-- **`TrackingTelemetryRecorder`** only observes. Switching it off cannot change what AltTab does.
+- **`TrackingTelemetryRecorder`** only observes. Switching it off cannot change what Switchy does.
 
 The model also exposes a read-only current user context for downstream UX: unknown, front application only,
 or exact represented window. Active-screen placement, initial selection, fullscreen shortcut protection and
@@ -33,7 +33,7 @@ one-window-per-app representation consume this statement. Unknown is never inter
 
 ## Who may write the order
 
-- **an attention decision** — a click naming its target, AltTab's own switch, or an app answering which of
+- **an attention decision** — a click naming its target, Switchy's own switch, or an app answering which of
   its windows it considers focused (including Cmd+`). The only source that may claim the user moved.
 - **a structural repair** — the front window closed and something has to take its place, or a tab group
   changed which member it draws. Not a claim about the user at all.

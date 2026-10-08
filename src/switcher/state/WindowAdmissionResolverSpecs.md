@@ -2,7 +2,7 @@
 
 ## Product object
 
-AltTab offers switch destinations, not every rectangle WindowServer paints. `PhysicalSurface` owns existence,
+Switchy offers switch destinations, not every rectangle WindowServer paints. `PhysicalSurface` owns existence,
 geometry, level and parentage. `SemanticSurface` owns AX meaning. `SwitchDestinationDecision` joins them without
 giving either source universal authority.
 

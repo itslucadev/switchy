@@ -5,7 +5,66 @@
 One-shot window screenshots for thumbnails and Preview. macOS 26+ captures through ScreenCaptureKit
 (`WindowCaptureScreenshots`); older versions capture through the private `CGSHWCaptureWindowList`
 (`WindowCaptureScreenshotsPrivateApi`), because SCK is unreliable there (macOS 14 crashes inside Apple's
-code, macOS 15 leaks).
+code, macOS 15 leaks). Thumbnail captures are tile-scale on every macOS version: macOS 26+ configures
+SCK at thumbnail pixel size, and pre-26 frames (which `CGSHWCaptureWindowList` always returns as a
+full Retina raster) are aspect-fit downscaled on `BackgroundWork.screenshotsQueue` before they reach
+`Window.thumbnail`. Full-resolution Preview frames are a separate, on-demand capture
+(`fullRes: true` on either path) delivered to the session's capped cache instead.
+
+## Pre-macOS-26 thumbnail downscale
+
+`WindowCaptureScreenshotsPrivateApi.oneTimeCapture` calls `CGSHWCaptureWindowList` with
+`.ignoreGlobalClipShape`, `.bestResolution`, and `.fullSize`. That API has no thumbnail-size
+parameter, so the returned `CGImage` is a full Retina raster. Still on `screenshotsQueue` (the
+queue the capture already runs on), the image is passed through
+`CGImage.resizedCopyWithCoreGraphics(_:_:)` with `TilesPanel.maxPossibleThumbnailSize` as the
+bound, then delivered to `Window.thumbnail`.
+
+`resizedCopyWithCoreGraphics` aspect-fits into the bound (never stretches, never upscales) and
+produces integral positive pixel dimensions. An image that already fits, a zero / negative /
+non-finite bound, or a failed `CGContext` / `makeImage` returns the original object so a
+thumbnail is never dropped because of sizing. After a successful downscale the full-resolution
+raster is not retained: only the smaller copy is handed to `Window`.
+
+A 3024x1964 capture into a 753x482 bound yields 742x482 (height-limited, aspect preserved).
+
+## Pre-macOS-26 full-resolution Preview capture
+
+Because the tile capture is downsampled, `WindowThumbnails.fetchPreviewFrames` no longer no-ops
+below macOS 26: it routes to `WindowCaptureScreenshotsPrivateApi.oneTimeScreenshots(fullRes: true)`
+(same `#available` split as `refreshAsync`). The full-res request mirrors the ScreenCaptureKit
+path's semantics:
+
+- **Distinct throttler key**: `preview-wid-<id>` instead of `capture-wid-<id>`, so a preview fetch
+  is never coalesced away by the tile capture of the same window submitted milliseconds earlier;
+  a tile capture must not stand in for a preview fetch. Preview requests coalesce on the requesting
+  session's own throttler instance (kept in `WeakOriginatingSession`, replaced when a different
+  session fetches), so a new session's request also cannot be coalesced into a previous session's
+  still-pending one; tile captures keep the shared `Applications.screenshotThrottler`.
+- **Same schedulers and guards**: the same 200ms per-wid cap and priority scheme (the shared
+  screenshot throttler for tiles, the session-owned preview throttler for previews), the 8-wide
+  `BackgroundWork.screenshotsQueue`, the
+  `ActiveWindowCaptures.runSync` gate, the `App.isTerminating` / `ScreenLockEvents.isScreenLocked`
+  guards, and the `SwitcherSession.isActive` re-checks at every hop for
+  `.refreshOnlyThumbnailsAfterShowUi` sources.
+- **Origin identity**: captures carry the requesting session weakly (`WeakOriginatingSession`), so a
+  long/stuck capture retains neither the ended session nor its frame cache. Delivery stores the frame
+  only while the origin is still `SwitcherSession.current` (instance identity); a capture completing
+  after that session ended, or after a newer session opened, is dropped instead of landing in the
+  next session's cache. Tile captures carry no origin and are unchanged. A forgotten window's
+  still-pending preview entry is dropped with it via `WindowThumbnails.forgetPreviewCapture`.
+- **No downscale**: the raw Retina raster skips `resizedCopyWithCoreGraphics` and goes to the
+  session's capped preview cache via the shared `deliverCapture`, never to `Window.thumbnail`, so
+  it dies with the session instead of parking a full-resolution raster per window.
+- **No downgrade**: delivery is routed by the `fullRes` flag, so a tile-scale capture can never
+  enter the preview cache; and `Window.refreshThumbnail` only forwards a tile-scale frame to
+  `PreviewPanel.updateIfShowing` while the session has no full-res frame for that wid.
+  `SwitcherSession.pinnedPreviewWid` is set before the fetch is enqueued and kept while the image
+  is pending, so that guard keeps holding: eviction cannot drop the selected frame and expose a
+  late tile-scale refresh on screen.
+
+`isPartialFrame` deliberately does not judge pre-26 frames: `CGSHWCaptureWindowList` sizes its
+output itself, so there is no exact pixel expectation to compare against.
 
 ## SCK API selection (macOS 26+)
 

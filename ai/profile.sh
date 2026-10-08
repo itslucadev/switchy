@@ -7,8 +7,9 @@ xcrun xctrace record \
   --time-limit 20s \
   --no-prompt --quiet \
   --output "$profileFile".trace \
+  --target-stdout "$profileFile".benchmark \
   --launch -- \
-    DerivedData/Build/Products/Debug/AltTab.app --benchmark showUi 3
+    DerivedData/Build/Products/Debug/Switchy.app --benchmark showUi 3
 
 xcrun xctrace export \
   --input "$profileFile".trace \

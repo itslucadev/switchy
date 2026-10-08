@@ -22,7 +22,7 @@ the resulting actions.
   **not** focus the window on release (it enters search instead).
 - Switching directly from one shortcut slot to another is handled.
 - **Escape**: while the switcher is active (e.g. Option held), Escape fires the cancel shortcut; when the
-  switcher is closed, Escape does nothing (AltTab doesn't swallow it).
+  switcher is closed, Escape does nothing (Switchy doesn't swallow it).
 
 ## Test scenarios
 

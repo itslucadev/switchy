@@ -2,8 +2,8 @@ import Cocoa
 import Sparkle
 
 /// Side-effect dispatcher for preference changes. Each branch of `preferenceChanged(_:)`
-/// calls into a domain-specific owner (Menubar, TrackpadEvents, SparkleDelegate, LoginItem,
-/// ProFeature) rather than implementing the side effect inline. Over time each call-site
+/// calls into a domain-specific owner (Menubar, TrackpadEvents, SparkleDelegate, LoginItem)
+/// rather than implementing the side effect inline. Over time each call-site
 /// should subscribe directly to its own preference; this file is a transition scaffold.
 class PreferencesEvents {
     private static var initialized = false
@@ -59,17 +59,16 @@ class PreferencesEvents {
             }
             return
         }
-        if LicenseManager.shared.isProLocked && ProFeature.isStoredValuePro(preferenceKey: key) {
-            UpgradeTab.navigateToUpgradeTab()
-        }
         ControlsTab.preferenceChanged(key)
         switch key {
         case "menubarIcon", "menubarIconShown": applyMenubarPreferencesIfReady()
         case "nextWindowGesture": TrackpadEvents.toggle(Preferences.nextWindowGesture != .disabled)
         case "startAtLogin": LoginItem.applyCurrentPreference()
         case "updatePolicy": applyUpdatePolicyPreference()
-        case let k where preferencesRequiringUiReset.contains(k): App.resetPreferencesDependentComponents()
-        case let k where isOverrideKey(k) || isPerShortcutGroupingKey(k): App.resetPreferencesDependentComponents()
+        case let k where preferencesRequiringUiReset.contains(k):
+            App.resetPreferencesDependentComponents()
+        case let k where isOverrideKey(k) || isPerShortcutGroupingKey(k):
+            App.resetPreferencesDependentComponents()
         default: break
         }
     }
@@ -83,7 +82,8 @@ class PreferencesEvents {
         GeneralTab.policyLock = true
         let policy = Preferences.updatePolicy
         App.updaterController?.updater.automaticallyDownloadsUpdates = policy == .autoInstall
-        App.updaterController?.updater.automaticallyChecksForUpdates = policy == .autoInstall || policy == .autoCheck
+        App.updaterController?.updater.automaticallyChecksForUpdates =
+            policy == .autoInstall || policy == .autoCheck
         GeneralTab.policyLock = false
     }
 }

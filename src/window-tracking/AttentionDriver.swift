@@ -245,7 +245,7 @@ struct AttentionDriver {
     }
 
     /// **Seed the model's idea of the front app from the world, not only from transitions it happened to
-    /// witness.** It learns "frontmost" from activations, and an app that was already frontmost when AltTab
+    /// witness.** It learns "frontmost" from activations, and an app that was already frontmost when Switchy
     /// started produced none — so every answer that app gave was about a process the model did not think was
     /// in front, and Cmd+` inside it moved nothing.
     private mutating func syncFrontmost(_ context: Context) {
@@ -256,7 +256,7 @@ struct AttentionDriver {
     }
 
     /// A pid the model has not seen — or has seen under an older generation — is registered before its event
-    /// is offered, so it does not answer `staleGeneration` for every app that was already running when AltTab
+    /// is offered, so it does not answer `staleGeneration` for every app that was already running when Switchy
     /// started.
     private mutating func register(_ pid: pid_t, _ context: Context) -> ProcessGeneration? {
         guard let process = context.generation(pid) else { return nil }

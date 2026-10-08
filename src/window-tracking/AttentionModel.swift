@@ -149,7 +149,7 @@ struct FocusedWindowFact: Equatable {
 enum AttentionNamer: Equatable {
     /// the type-13 click channel — the earliest source there is, and the only one that survives a wedged app
     case click
-    /// AltTab's own switch: we activate the app ourselves, so the action names both levels
+    /// Switchy's own switch: we activate the app ourselves, so the action names both levels
     case altTab
     /// the app's own accessibility answer about which of its windows is focused
     case app

@@ -34,12 +34,12 @@ class KeyboardEvents {
             DispatchQueue.main.async {
                 let modifiers = NSEvent.ModifierFlags(rawValue: UInt(cgEvent.flags.rawValue))
                 // TODO: ideally, we want to absorb all modifier keys except holdShortcut
-                // it was pressed down before AltTab was triggered, so we should let the up event through
+                // it was pressed down before Switchy was triggered, so we should let the up event through
                 handleKeyboardEvent(nil, nil, nil, modifiers, false)
             }
             return Unmanaged.passUnretained(cgEvent)
         case .keyDown:
-            // Issue #5585. Esc only — absorb when AltTab is using it and a shortcut binds it. cghid is
+            // Issue #5585. Esc only — absorb when Switchy is using it and a shortcut binds it. cghid is
             // the earliest tap point; absorbing here preempts macOS 26 Game Overlay's hook on `⌘⎋`.
             if cgEvent.getIntegerValueField(.keyboardEventKeycode) != Int64(kVK_Escape) ||
                 !anyShortcutUsesEscape || !SwitcherSession.isActive {

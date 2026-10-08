@@ -11,7 +11,9 @@ func sidebarSeparatorView() -> NSBox {
 /// ControlsTab. Callers are responsible for pinning a fixed width on `sidebar` and `editor`.
 /// Sidebar and editor heights are tied (`sidebar.height == editor.height`), and the content is
 /// pinned to all four edges of the returned `SidebarListContainer`.
-func makeSidebarEditorContainer(sidebar: NSView, editor: NSView, minHeight: CGFloat? = nil) -> SidebarListContainer {
+func makeSidebarEditorContainer(sidebar: NSView, editor: NSView, minHeight: CGFloat? = nil)
+    -> SidebarListContainer
+{
     let separator = sidebarSeparatorView()
     separator.widthAnchor.constraint(equalToConstant: 1).isActive = true
     let content = NSStackView(views: [sidebar, separator, editor])
@@ -86,11 +88,9 @@ class SidebarListRow: ClickHoverStackView {
     private var iconWidthConstraint: NSLayoutConstraint?
     private var iconHeightConstraint: NSLayoutConstraint?
     private let titleLabel = DynamicColorTextField(labelWithString: "")
-    private let titleRow = NSStackView()
     private let summaryLabel = DynamicColorTextField(labelWithString: "")
     private let chevronLabel = DynamicColorTextField(labelWithString: "›")
     private let textColumn = NSStackView()
-    private var proBadge: ProBadgeView?
     private var isSelectedRow = false
     private var isHoveredRow = false
     private var windowObservers = [NSObjectProtocol]()
@@ -124,23 +124,29 @@ class SidebarListRow: ClickHoverStackView {
         titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         summaryLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         titleLabel.colorProvider = { [weak self] in self?.textColor(for: .title) ?? .labelColor }
-        summaryLabel.colorProvider = { [weak self] in self?.textColor(for: .summary) ?? .secondaryLabelColor }
-        chevronLabel.colorProvider = { [weak self] in self?.textColor(for: .chevron) ?? .secondaryLabelColor }
-        titleRow.orientation = .horizontal
-        titleRow.alignment = .centerY
-        titleRow.spacing = 6
-        titleRow.translatesAutoresizingMaskIntoConstraints = false
-        titleRow.addArrangedSubview(titleLabel)
-        textColumn.addArrangedSubview(titleRow)
+        summaryLabel.colorProvider = { [weak self] in
+            self?.textColor(for: .summary) ?? .secondaryLabelColor
+        }
+        chevronLabel.colorProvider = { [weak self] in
+            self?.textColor(for: .chevron) ?? .secondaryLabelColor
+        }
+        textColumn.addArrangedSubview(titleLabel)
         textColumn.addArrangedSubview(summaryLabel)
         addArrangedSubview(iconView)
         addArrangedSubview(textColumn)
         addArrangedSubview(spacer)
         addArrangedSubview(chevronLabel)
-        iconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: TableGroupView.padding).isActive = true
-        textColumn.leadingAnchor.constraint(greaterThanOrEqualTo: iconView.trailingAnchor, constant: 8).isActive = true
-        textColumn.trailingAnchor.constraint(lessThanOrEqualTo: chevronLabel.leadingAnchor, constant: -8).isActive = true
-        chevronLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -TableGroupView.padding).isActive = true
+        iconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: TableGroupView.padding)
+            .isActive = true
+        textColumn.leadingAnchor.constraint(
+            greaterThanOrEqualTo: iconView.trailingAnchor, constant: 8
+        ).isActive = true
+        textColumn.trailingAnchor.constraint(
+            lessThanOrEqualTo: chevronLabel.leadingAnchor, constant: -8
+        ).isActive = true
+        chevronLabel.trailingAnchor.constraint(
+            equalTo: trailingAnchor, constant: -TableGroupView.padding
+        ).isActive = true
         updateStyle()
     }
 
@@ -164,9 +170,11 @@ class SidebarListRow: ClickHoverStackView {
         windowObservers.removeAll()
         guard let window else { return }
         for name in [NSWindow.didBecomeKeyNotification, NSWindow.didResignKeyNotification] {
-            windowObservers.append(NotificationCenter.default.addObserver(forName: name, object: window, queue: .main) { [weak self] _ in
-                self?.updateStyle()
-            })
+            windowObservers.append(
+                NotificationCenter.default.addObserver(forName: name, object: window, queue: .main)
+                { [weak self] _ in
+                    self?.updateStyle()
+                })
         }
         updateStyle()
     }
@@ -241,31 +249,6 @@ class SidebarListRow: ClickHoverStackView {
         updateStyle()
     }
 
-    func setProBadge(_ show: Bool) {
-        // No-op if already in the requested state. Rows are recycled across refreshes, so this is
-        // called repeatedly with the same value; without this guard each call would leave the old
-        // (now badge-less) `wrapper` in `titleRow` and append a new one — the wrappers pile up,
-        // each adding `titleRow.spacing`, progressively squeezing and truncating the title.
-        guard show != (proBadge != nil) else { return }
-        // Remove the whole wrapper from `titleRow`, not just the badge from the wrapper.
-        proBadge?.superview?.removeFromSuperview()
-        proBadge = nil
-        if show {
-            let badge = ProBadgeView()
-            let wrapper = NSView()
-            wrapper.translatesAutoresizingMaskIntoConstraints = false
-            wrapper.addSubview(badge)
-            NSLayoutConstraint.activate([
-                badge.leadingAnchor.constraint(equalTo: wrapper.leadingAnchor),
-                badge.trailingAnchor.constraint(equalTo: wrapper.trailingAnchor),
-                badge.centerYAnchor.constraint(equalTo: wrapper.centerYAnchor, constant: 1),
-                wrapper.heightAnchor.constraint(equalTo: badge.heightAnchor),
-            ])
-            titleRow.addArrangedSubview(wrapper)
-            proBadge = badge
-        }
-    }
-
     private var isWindowKey: Bool { window?.isKeyWindow ?? false }
 
     private enum LabelRole { case title, summary, chevron }
@@ -283,8 +266,8 @@ class SidebarListRow: ClickHoverStackView {
             return isWindowKey ? .alternateSelectedControlTextColor : .labelColor
         }
         switch role {
-            case .title: return .labelColor
-            case .summary, .chevron: return .secondaryLabelColor
+        case .title: return .labelColor
+        case .summary, .chevron: return .secondaryLabelColor
         }
     }
 
@@ -297,7 +280,8 @@ class SidebarListRow: ClickHoverStackView {
             // Filtering / Appearance tabs and the segmented buttons above.
             // `unemphasizedSelectedContentBackgroundColor` is what AppKit table cells fall back
             // to when the window isn't key.
-            selectedBackground = isKey ? .controlAccentColor : .unemphasizedSelectedContentBackgroundColor
+            selectedBackground =
+                isKey ? .controlAccentColor : .unemphasizedSelectedContentBackgroundColor
         } else {
             selectedBackground = isKey ? .systemAccentColor : .lightGray
         }
@@ -309,7 +293,8 @@ class SidebarListRow: ClickHoverStackView {
         } else {
             backgroundColor = .clear
         }
-        titleLabel.font = NSFont.systemFont(ofSize: 13, weight: isSelectedRow ? .semibold : .regular)
+        titleLabel.font = NSFont.systemFont(
+            ofSize: 13, weight: isSelectedRow ? .semibold : .regular)
         let previousAppearance = NSAppearance.current
         NSAppearance.current = effectiveAppearance
         layer?.backgroundColor = backgroundColor.cgColor
@@ -317,6 +302,5 @@ class SidebarListRow: ClickHoverStackView {
         titleLabel.needsDisplay = true
         summaryLabel.needsDisplay = true
         chevronLabel.needsDisplay = true
-        proBadge?.setSelected(isSelectedRow && isKey)
     }
 }

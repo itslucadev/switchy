@@ -7,7 +7,7 @@ github_api_request() {
   curl -s \
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: token $GITHUB_TOKEN" \
-    "https://api.github.com/repos/lwouis/alt-tab-macos$url"
+    "https://api.github.com/repos/itslucadev/switchy$url"
 }
 
 unicode_sort() {
@@ -27,7 +27,7 @@ github_contributors() {
 update_developer_contributors() {
   local file="docs/contributors.md"
   {
-    echo "## [Developed the app](https://github.com/lwouis/alt-tab-macos/graphs/contributors)"
+    echo "## [Developed the app](https://github.com/itslucadev/switchy/graphs/contributors)"
     echo
     github_contributors
     echo

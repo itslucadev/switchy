@@ -1,6 +1,6 @@
 import Cocoa
 
-/// The WindowServer event tap: AltTab's source of truth for window lifecycle, geometry and Space
+/// The WindowServer event tap: Switchy's source of truth for window lifecycle, geometry and Space
 /// membership. Those physical facts come from SkyLight's notify-proc stream — immune to a busy or AX-lying
 /// app (e.g. Electron throwing away its AX tree). See `SkyLight.framework.swift` for the underlying calls and
 /// `windowserver/` for the pure decision layer (routing, decode, acquisition). Per-process AX observers own
@@ -32,11 +32,11 @@ class WindowServerEvents {
     static var inSpaceTransition: Bool { ProcessInfo.processInfo.systemUptime < spaceTransitionUntil }
     /// debounces the 1329/1401 Space-change burst into one settled handler (replaces SpacesEvents)
     private static var spaceChangeWorkItem: DispatchWorkItem?
-    /// **AltTab's own switch names its target.** It is one of the model's namers, so it goes there
+    /// **Switchy's own switch names its target.** It is one of the model's namers, so it goes there
     /// directly rather than waiting for the OS to describe what we just did. The activation that follows a
     /// cross-app switch carries the same wid, which is redundant and deliberately so: the two arrive in
     /// either order and naming the same window twice is a no-op.
-    static func noteAltTabInitiatedFocus(_ wid: CGWindowID, _ pid: pid_t) {
+    static func noteSwitchyInitiatedFocus(_ wid: CGWindowID, _ pid: pid_t) {
         let now = ProcessInfo.processInfo.systemUptime
         altTabInitiatedFocus = (wid: wid, pid: pid, at: now)
         TrackedWindowStateBridge.dispatch(.altTabFocusedWindowInFrontmostApp(wid: wid, pid: pid, now: now))

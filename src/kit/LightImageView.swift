@@ -45,4 +45,17 @@ enum CALayerContents {
             return pixelBuffer?.size()
         }
     }
+
+    var byteSize: UInt64 {
+        switch self {
+        case .cgImage(let image):
+            guard let image, image.bytesPerRow > 0, image.height > 0 else { return 0 }
+            let (bytes, overflow) = UInt64(image.bytesPerRow).multipliedReportingOverflow(
+                by: UInt64(image.height))
+            return overflow ? UInt64.max : bytes
+        case .pixelBuffer(let pixelBuffer):
+            guard let pixelBuffer else { return 0 }
+            return UInt64(CVPixelBufferGetDataSize(pixelBuffer))
+        }
+    }
 }

@@ -176,7 +176,7 @@ final class TestReducerRunnerTests: XCTestCase {
 
     /// rec27 (2026-07-18, `tabdiag_rec27_fullscreen_burst_flicker.log` @ 19:36:51): bursting ⌘T inside a
     /// FULLSCREEN Finder window made its tile disappear for ~2.5s. The burst's new tabs churn as UNTRACKED
-    /// wids joining and leaving the fullscreen Space, so when the tracked active's own 1326 lands, AltTab
+    /// wids joining and leaving the fullscreen Space, so when the tracked active's own 1326 lands, Switchy
     /// holds it visible — correctly — and then released the hold ~200ms later because a SECOND fullscreen
     /// Finder window, sitting on another Space at the identical 1440×900@0,0 frame, passed as its
     /// "replacement". Nothing could be drawn for the window, so it went phantom and the tile vanished until
@@ -460,10 +460,10 @@ final class TestReducerRunnerTests: XCTestCase {
 
     /// #5785, the stuck switcher: two alt-tabs in a row into the SAME app, 219ms apart (log2). The first is a
     /// cross-app activation, the second a switch inside the app that is already frontmost — which produces no
-    /// activation at all, so AltTab naming its own target is the only thing that says the user moved. Since
+    /// activation at all, so Switchy naming its own target is the only thing that says the user moved. Since
     /// re-focusing an already-focused window emits nothing either, a second switch that goes unheard is never
     /// corrected, and every later alt-tab lands on the window the user is already in.
-    func testTwoAltTabsIntoTheSameAppBothMoveTheOrder() {
+    func testTwoSwitchysIntoTheSameAppBothMoveTheOrder() {
         let chromeA = window(100, spaceIds: [3], lastFocusOrder: 1)
         let chromeB = window(101, spaceIds: [3], lastFocusOrder: 2)
         let other = window(200, pid: 700, spaceIds: [3], lastFocusOrder: 0)   // the app we alt-tab away from
@@ -472,11 +472,11 @@ final class TestReducerRunnerTests: XCTestCase {
             localizedName: "WeChat", isHidden: false), isActive: true)
         let harness = TestReducerRunner(initial: s)
         harness.run([
-            // alt-tab 1: AltTab focuses Chrome's window A, so its activation carries the known target
+            // alt-tab 1: Switchy focuses Chrome's window A, so its activation carries the known target
             .setFrontmost(pid: 500),
             .input(.appActivated(pid: 500, now: 10.0, altTabTargetWid: 100)),
             .input(.attentionCommitted(wid: 100, observed: 100, at: 10.0)),
-            // alt-tab 2, a beat later: AltTab focuses window B inside the app that is already frontmost, so
+            // alt-tab 2, a beat later: Switchy focuses window B inside the app that is already frontmost, so
             // our own switch names it. No activation follows, and the 808 it produces is not attention.
             .input(.attentionCommitted(wid: 101, observed: 101, at: 10.219)),
         ])
@@ -823,7 +823,7 @@ final class TestReducerRunnerTests: XCTestCase {
         harness.state.windows.sorted { $0.lastFocusOrder < $1.lastFocusOrder }.compactMap { $0.wid }
     }
 
-    /// With no focus history at all, screen stacking IS the order: AltTab launched into a desktop it did not
+    /// With no focus history at all, screen stacking IS the order: Switchy launched into a desktop it did not
     /// watch being built, and top-most first is the best guess available on that first summon.
     func testZOrderSeedsWindowsWithNoFocusHistory() {
         let harness = TestReducerRunner(initial: state(windows: [

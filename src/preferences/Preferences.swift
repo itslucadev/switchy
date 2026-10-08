@@ -1,5 +1,5 @@
-import Cocoa
 import Carbon.HIToolbox.Events
+import Cocoa
 import ShortcutRecorder
 
 class Preferences {
@@ -45,32 +45,46 @@ class Preferences {
             "captureWindowsInBackground": "true",
             "screenRecordingPermissionSkipped": "false",
             "trackpadHapticFeedbackEnabled": "true",
-            "settingsWindowShownOnFirstLaunch": "false",
         ]
         (0..<maxShortcutCount).forEach { index in
             values[indexToName("holdShortcut", index)] = defaultShortcut("⌥")
-            values[indexToName("nextWindowShortcut", index)] = defaultShortcut(index == 0 ? "⇥" : (index == 1 ? keyAboveTabDependingOnInputSource() : ""))
+            values[indexToName("nextWindowShortcut", index)] = defaultShortcut(
+                index == 0 ? "⇥" : (index == 1 ? keyAboveTabDependingOnInputSource() : ""))
         }
         (0...maxShortcutCount).forEach { index in
-            values[indexToName("appsToShow", index)] = index == 1 ? AppsToShowPreference.active.indexAsString : (index == 2 ? AppsToShowPreference.nonActive.indexAsString : AppsToShowPreference.all.indexAsString)
+            values[indexToName("appsToShow", index)] =
+                index == 1
+                ? AppsToShowPreference.active.indexAsString
+                : (index == 2
+                    ? AppsToShowPreference.nonActive.indexAsString
+                    : AppsToShowPreference.all.indexAsString)
             values[indexToName("spacesToShow", index)] = SpacesToShowPreference.all.indexAsString
             values[indexToName("screensToShow", index)] = ScreensToShowPreference.all.indexAsString
-            values[indexToName("showMinimizedWindows", index)] = ShowHowPreference.show.indexAsString
+            values[indexToName("showMinimizedWindows", index)] =
+                ShowHowPreference.show.indexAsString
             values[indexToName("showHiddenWindows", index)] = ShowHowPreference.show.indexAsString
-            values[indexToName("showFullscreenWindows", index)] = ShowHowPreference.show.indexAsString
-            values[indexToName("showWindowlessApps", index)] = ShowHowPreference.showAtTheEnd.indexAsString
-            values[indexToName("windowOrder", index)] = WindowOrderPreference.recentlyFocused.indexAsString
-            values[indexToName("shortcutStyle", index)] = ShortcutStylePreference.focusOnRelease.indexAsString
-            values[indexToName("showAppsOrWindows", index)] = GroupAppsPreference.allWindows.indexAsString
-            values[indexToName("showTabsAsWindows", index)] = GroupTabsPreference.singleWindow.indexAsString
-            // Override defaults are the FREE-tier value for Pro-gated prefs (so `snapshotAndDowngrade`
-            // is a no-op for unset overrides), and the global default for non-gated prefs.
+            values[indexToName("showFullscreenWindows", index)] =
+                ShowHowPreference.show.indexAsString
+            values[indexToName("showWindowlessApps", index)] =
+                ShowHowPreference.showAtTheEnd.indexAsString
+            values[indexToName("windowOrder", index)] =
+                WindowOrderPreference.recentlyFocused.indexAsString
+            values[indexToName("shortcutStyle", index)] =
+                ShortcutStylePreference.focusOnRelease.indexAsString
+            values[indexToName("showAppsOrWindows", index)] =
+                GroupAppsPreference.allWindows.indexAsString
+            values[indexToName("showTabsAsWindows", index)] =
+                GroupTabsPreference.singleWindow.indexAsString
             // `hasOverride(_:_:)` consults `persistentDomain` so registered defaults don't make
             // an unset override look set.
-            values[indexToName("appearanceStyleOverride", index)] = AppearanceStylePreference.thumbnails.indexAsString
-            values[indexToName("appearanceSizeOverride", index)] = AppearanceSizePreference.medium.indexAsString
-            values[indexToName("appearanceThemeOverride", index)] = AppearanceThemePreference.system.indexAsString
-            values[indexToName("shortcutStyleOverride", index)] = ShortcutStylePreference.doNothingOnRelease.indexAsString
+            values[indexToName("appearanceStyleOverride", index)] =
+                AppearanceStylePreference.thumbnails.indexAsString
+            values[indexToName("appearanceSizeOverride", index)] =
+                AppearanceSizePreference.medium.indexAsString
+            values[indexToName("appearanceThemeOverride", index)] =
+                AppearanceThemePreference.system.indexAsString
+            values[indexToName("shortcutStyleOverride", index)] =
+                ShortcutStylePreference.doNothingOnRelease.indexAsString
             values[indexToName("previewFocusedWindowOverride", index)] = "false"
         }
         return values
@@ -82,25 +96,44 @@ class Preferences {
     }
     static let staticShortcutKeys = [
         "focusWindowShortcut", "previousWindowShortcut", "cancelShortcut", "closeWindowShortcut",
-        "minDeminWindowShortcut", "toggleFullscreenWindowShortcut", "quitAppShortcut", "hideShowAppShortcut", "searchShortcut",
+        "minDeminWindowShortcut", "toggleFullscreenWindowShortcut", "quitAppShortcut",
+        "hideShowAppShortcut", "searchShortcut",
     ]
     static var allShortcutPreferenceKeys: [String] {
-        staticShortcutKeys + (0..<maxShortcutCount).flatMap { [indexToName("holdShortcut", $0), indexToName("nextWindowShortcut", $0)] }
+        staticShortcutKeys
+            + (0..<maxShortcutCount).flatMap {
+                [indexToName("holdShortcut", $0), indexToName("nextWindowShortcut", $0)]
+            }
     }
-    static let emptyShortcut = Shortcut(code: .none, modifierFlags: [], characters: nil, charactersIgnoringModifiers: nil)
+    static let emptyShortcut = Shortcut(
+        code: .none, modifierFlags: [], characters: nil, charactersIgnoringModifiers: nil)
     private static let shortcutStorageStringField = "string"
     private static let shortcutStorageDataField = "secureData"
 
     // persisted values
-    static var holdShortcut: [Shortcut?] { (0..<shortcutCount).map { CachedUserDefaults.shortcut(indexToName("holdShortcut", $0)) } }
-    static var nextWindowShortcut: [Shortcut?] { (0..<shortcutCount).map { CachedUserDefaults.shortcut(indexToName("nextWindowShortcut", $0)) } }
-    static var nextWindowGesture: GesturePreference { CachedUserDefaults.macroPref("nextWindowGesture", GesturePreference.allCases) }
+    static var holdShortcut: [Shortcut?] {
+        (0..<shortcutCount).map { CachedUserDefaults.shortcut(indexToName("holdShortcut", $0)) }
+    }
+    static var nextWindowShortcut: [Shortcut?] {
+        (0..<shortcutCount).map {
+            CachedUserDefaults.shortcut(indexToName("nextWindowShortcut", $0))
+        }
+    }
+    static var nextWindowGesture: GesturePreference {
+        CachedUserDefaults.macroPref("nextWindowGesture", GesturePreference.allCases)
+    }
     static var focusWindowShortcut: Shortcut? { CachedUserDefaults.shortcut("focusWindowShortcut") }
-    static var previousWindowShortcut: Shortcut? { CachedUserDefaults.shortcut("previousWindowShortcut") }
+    static var previousWindowShortcut: Shortcut? {
+        CachedUserDefaults.shortcut("previousWindowShortcut")
+    }
     static var cancelShortcut: Shortcut? { CachedUserDefaults.shortcut("cancelShortcut") }
     static var closeWindowShortcut: Shortcut? { CachedUserDefaults.shortcut("closeWindowShortcut") }
-    static var minDeminWindowShortcut: Shortcut? { CachedUserDefaults.shortcut("minDeminWindowShortcut") }
-    static var toggleFullscreenWindowShortcut: Shortcut? { CachedUserDefaults.shortcut("toggleFullscreenWindowShortcut") }
+    static var minDeminWindowShortcut: Shortcut? {
+        CachedUserDefaults.shortcut("minDeminWindowShortcut")
+    }
+    static var toggleFullscreenWindowShortcut: Shortcut? {
+        CachedUserDefaults.shortcut("toggleFullscreenWindowShortcut")
+    }
     static var quitAppShortcut: Shortcut? { CachedUserDefaults.shortcut("quitAppShortcut") }
     static var hideShowAppShortcut: Shortcut? { CachedUserDefaults.shortcut("hideShowAppShortcut") }
     static var searchShortcut: Shortcut? { CachedUserDefaults.shortcut("searchShortcut") }
@@ -109,54 +142,149 @@ class Preferences {
     // periphery:ignore
     static var vimKeysEnabled: Bool { CachedUserDefaults.bool("vimKeysEnabled") }
     static var mouseHoverEnabled: Bool { CachedUserDefaults.bool("mouseHoverEnabled") }
-    static var cursorFollowFocus: CursorFollowFocus { CachedUserDefaults.macroPref("cursorFollowFocus", CursorFollowFocus.allCases) }
-    static var trackpadHapticFeedbackEnabled: Bool { CachedUserDefaults.bool("trackpadHapticFeedbackEnabled") }
+    static var cursorFollowFocus: CursorFollowFocus {
+        CachedUserDefaults.macroPref("cursorFollowFocus", CursorFollowFocus.allCases)
+    }
+    static var trackpadHapticFeedbackEnabled: Bool {
+        CachedUserDefaults.bool("trackpadHapticFeedbackEnabled")
+    }
     static var hideColoredCircles: Bool { CachedUserDefaults.bool("hideColoredCircles") }
     static var windowDisplayDelayInMs: Int { CachedUserDefaults.int("windowDisplayDelay") }
-    static var windowDisplayDelay: DispatchTimeInterval { DispatchTimeInterval.milliseconds(windowDisplayDelayInMs) }
+    static var windowDisplayDelay: DispatchTimeInterval {
+        DispatchTimeInterval.milliseconds(windowDisplayDelayInMs)
+    }
     static var fadeOutAnimation: Bool { CachedUserDefaults.bool("fadeOutAnimation") }
     static var previewFadeInAnimation: Bool { CachedUserDefaults.bool("previewFadeInAnimation") }
     static var hideSpaceNumberLabels: Bool { CachedUserDefaults.bool("hideSpaceNumberLabels") }
     static var hideStatusIcons: Bool { CachedUserDefaults.bool("hideStatusIcons") }
     // periphery:ignore
     static var startAtLogin: Bool { CachedUserDefaults.bool("startAtLogin") }
-    static var exceptions: [ExceptionEntry] { CachedUserDefaults.json("exceptions", [ExceptionEntry].self) }
+    static var exceptions: [ExceptionEntry] {
+        CachedUserDefaults.json("exceptions", [ExceptionEntry].self)
+    }
     static var previewSelectedWindow: Bool { CachedUserDefaults.bool("previewFocusedWindow") }
-    static var captureWindowsInBackground: Bool { CachedUserDefaults.bool("captureWindowsInBackground") }
-    static var screenRecordingPermissionSkipped: Bool { CachedUserDefaults.bool("screenRecordingPermissionSkipped") }
-    static var settingsWindowShownOnFirstLaunch: Bool { CachedUserDefaults.bool("settingsWindowShownOnFirstLaunch") }
+    static var captureWindowsInBackground: Bool {
+        CachedUserDefaults.bool("captureWindowsInBackground")
+    }
+    static var screenRecordingPermissionSkipped: Bool {
+        CachedUserDefaults.bool("screenRecordingPermissionSkipped")
+    }
 
     // macro values
-    static var appearanceStyle: AppearanceStylePreference { ProGatedPreferences.appearanceStyle.read() }
-    static var appearanceSize: AppearanceSizePreference { ProGatedPreferences.appearanceSize.read() }
-    static var appearanceTheme: AppearanceThemePreference { CachedUserDefaults.macroPref("appearanceTheme", AppearanceThemePreference.allCases) }
+    static var appearanceStyle: AppearanceStylePreference {
+        CachedUserDefaults.macroPref("appearanceStyle", AppearanceStylePreference.allCases)
+    }
+    static var appearanceSize: AppearanceSizePreference {
+        CachedUserDefaults.macroPref("appearanceSize", AppearanceSizePreference.allCases)
+    }
+    static var appearanceTheme: AppearanceThemePreference {
+        CachedUserDefaults.macroPref("appearanceTheme", AppearanceThemePreference.allCases)
+    }
     // periphery:ignore
-    static var theme: ThemePreference { ThemePreference.macOs/*CachedUserDefaults.macroPref("theme", ThemePreference.allCases)*/ }
-    static var showOnScreen: ShowOnScreenPreference { CachedUserDefaults.macroPref("showOnScreen", ShowOnScreenPreference.allCases) }
-    static var titleTruncation: TitleTruncationPreference { CachedUserDefaults.macroPref("titleTruncation", TitleTruncationPreference.allCases) }
-    static var showTitles: ShowTitlesPreference { CachedUserDefaults.macroPref("showTitles", ShowTitlesPreference.allCases) }
-    static var updatePolicy: UpdatePolicyPreference { CachedUserDefaults.macroPref("updatePolicy", UpdatePolicyPreference.allCases) }
-    static var crashPolicy: CrashPolicyPreference { CachedUserDefaults.macroPref("crashPolicy", CrashPolicyPreference.allCases) }
-    static var appsToShow: [AppsToShowPreference] { (0...maxShortcutCount).map { CachedUserDefaults.macroPref(indexToName("appsToShow", $0), AppsToShowPreference.allCases) } }
-    static var spacesToShow: [SpacesToShowPreference] { (0...maxShortcutCount).map { CachedUserDefaults.macroPref(indexToName("spacesToShow", $0), SpacesToShowPreference.allCases) } }
-    static var screensToShow: [ScreensToShowPreference] { (0...maxShortcutCount).map { CachedUserDefaults.macroPref(indexToName("screensToShow", $0), ScreensToShowPreference.allCases) } }
-    static var showMinimizedWindows: [ShowHowPreference] { (0...maxShortcutCount).map { CachedUserDefaults.macroPref(indexToName("showMinimizedWindows", $0), ShowHowPreference.allCases) } }
-    static var showHiddenWindows: [ShowHowPreference] { (0...maxShortcutCount).map { CachedUserDefaults.macroPref(indexToName("showHiddenWindows", $0), ShowHowPreference.allCases) } }
-    static var showFullscreenWindows: [ShowHowPreference] { (0...maxShortcutCount).map { CachedUserDefaults.macroPref(indexToName("showFullscreenWindows", $0), ShowHowPreference.allCases) } }
-    static var showWindowlessApps: [ShowHowPreference] { (0...maxShortcutCount).map { CachedUserDefaults.macroPref(indexToName("showWindowlessApps", $0), ShowHowPreference.allCases) } }
-    static var windowOrder: [WindowOrderPreference] { (0...maxShortcutCount).map { CachedUserDefaults.macroPref(indexToName("windowOrder", $0), WindowOrderPreference.allCases) } }
+    static var theme: ThemePreference {
+        ThemePreference.macOs /*CachedUserDefaults.macroPref("theme", ThemePreference.allCases)*/
+    }
+    static var showOnScreen: ShowOnScreenPreference {
+        CachedUserDefaults.macroPref("showOnScreen", ShowOnScreenPreference.allCases)
+    }
+    static var titleTruncation: TitleTruncationPreference {
+        CachedUserDefaults.macroPref("titleTruncation", TitleTruncationPreference.allCases)
+    }
+    static var showTitles: ShowTitlesPreference {
+        CachedUserDefaults.macroPref("showTitles", ShowTitlesPreference.allCases)
+    }
+    static var updatePolicy: UpdatePolicyPreference {
+        CachedUserDefaults.macroPref("updatePolicy", UpdatePolicyPreference.allCases)
+    }
+    static var crashPolicy: CrashPolicyPreference {
+        CachedUserDefaults.macroPref("crashPolicy", CrashPolicyPreference.allCases)
+    }
+    static var appsToShow: [AppsToShowPreference] {
+        (0...maxShortcutCount).map {
+            CachedUserDefaults.macroPref(
+                indexToName("appsToShow", $0), AppsToShowPreference.allCases)
+        }
+    }
+    static var spacesToShow: [SpacesToShowPreference] {
+        (0...maxShortcutCount).map {
+            CachedUserDefaults.macroPref(
+                indexToName("spacesToShow", $0), SpacesToShowPreference.allCases)
+        }
+    }
+    static var screensToShow: [ScreensToShowPreference] {
+        (0...maxShortcutCount).map {
+            CachedUserDefaults.macroPref(
+                indexToName("screensToShow", $0), ScreensToShowPreference.allCases)
+        }
+    }
+    static var showMinimizedWindows: [ShowHowPreference] {
+        (0...maxShortcutCount).map {
+            CachedUserDefaults.macroPref(
+                indexToName("showMinimizedWindows", $0), ShowHowPreference.allCases)
+        }
+    }
+    static var showHiddenWindows: [ShowHowPreference] {
+        (0...maxShortcutCount).map {
+            CachedUserDefaults.macroPref(
+                indexToName("showHiddenWindows", $0), ShowHowPreference.allCases)
+        }
+    }
+    static var showFullscreenWindows: [ShowHowPreference] {
+        (0...maxShortcutCount).map {
+            CachedUserDefaults.macroPref(
+                indexToName("showFullscreenWindows", $0), ShowHowPreference.allCases)
+        }
+    }
+    static var showWindowlessApps: [ShowHowPreference] {
+        (0...maxShortcutCount).map {
+            CachedUserDefaults.macroPref(
+                indexToName("showWindowlessApps", $0), ShowHowPreference.allCases)
+        }
+    }
+    static var windowOrder: [WindowOrderPreference] {
+        (0...maxShortcutCount).map {
+            CachedUserDefaults.macroPref(
+                indexToName("windowOrder", $0), WindowOrderPreference.allCases)
+        }
+    }
 
-    static func showMinimizedWindows(_ i: Int) -> ShowHowPreference { CachedUserDefaults.macroPref(indexToName("showMinimizedWindows", i), ShowHowPreference.allCases) }
-    static func showHiddenWindows(_ i: Int) -> ShowHowPreference { CachedUserDefaults.macroPref(indexToName("showHiddenWindows", i), ShowHowPreference.allCases) }
-    static func showFullscreenWindows(_ i: Int) -> ShowHowPreference { CachedUserDefaults.macroPref(indexToName("showFullscreenWindows", i), ShowHowPreference.allCases) }
-    static func showWindowlessApps(_ i: Int) -> ShowHowPreference { CachedUserDefaults.macroPref(indexToName("showWindowlessApps", i), ShowHowPreference.allCases) }
-    static func windowOrder(_ i: Int) -> WindowOrderPreference { CachedUserDefaults.macroPref(indexToName("windowOrder", i), WindowOrderPreference.allCases) }
-    static func groupApps(_ i: Int) -> GroupAppsPreference { CachedUserDefaults.macroPref(indexToName("showAppsOrWindows", i), GroupAppsPreference.allCases) }
-    static func groupTabs(_ i: Int) -> GroupTabsPreference { CachedUserDefaults.macroPref(indexToName("showTabsAsWindows", i), GroupTabsPreference.allCases) }
-    static var shortcutStyle: ShortcutStylePreference { ProGatedPreferences.shortcutStyle.read() }
-    static var menubarIcon: MenubarIconPreference { CachedUserDefaults.macroPref("menubarIcon", MenubarIconPreference.allCases) }
+    static func showMinimizedWindows(_ i: Int) -> ShowHowPreference {
+        CachedUserDefaults.macroPref(
+            indexToName("showMinimizedWindows", i), ShowHowPreference.allCases)
+    }
+    static func showHiddenWindows(_ i: Int) -> ShowHowPreference {
+        CachedUserDefaults.macroPref(
+            indexToName("showHiddenWindows", i), ShowHowPreference.allCases)
+    }
+    static func showFullscreenWindows(_ i: Int) -> ShowHowPreference {
+        CachedUserDefaults.macroPref(
+            indexToName("showFullscreenWindows", i), ShowHowPreference.allCases)
+    }
+    static func showWindowlessApps(_ i: Int) -> ShowHowPreference {
+        CachedUserDefaults.macroPref(
+            indexToName("showWindowlessApps", i), ShowHowPreference.allCases)
+    }
+    static func windowOrder(_ i: Int) -> WindowOrderPreference {
+        CachedUserDefaults.macroPref(indexToName("windowOrder", i), WindowOrderPreference.allCases)
+    }
+    static func groupApps(_ i: Int) -> GroupAppsPreference {
+        CachedUserDefaults.macroPref(
+            indexToName("showAppsOrWindows", i), GroupAppsPreference.allCases)
+    }
+    static func groupTabs(_ i: Int) -> GroupTabsPreference {
+        CachedUserDefaults.macroPref(
+            indexToName("showTabsAsWindows", i), GroupTabsPreference.allCases)
+    }
+    static var shortcutStyle: ShortcutStylePreference {
+        CachedUserDefaults.macroPref("shortcutStyle", ShortcutStylePreference.allCases)
+    }
+    static var menubarIcon: MenubarIconPreference {
+        CachedUserDefaults.macroPref("menubarIcon", MenubarIconPreference.allCases)
+    }
     static var menubarIconShown: Bool { CachedUserDefaults.bool("menubarIconShown") }
-    static var language: LanguagePreference { CachedUserDefaults.macroPref("language", LanguagePreference.allCases) }
+    static var language: LanguagePreference {
+        CachedUserDefaults.macroPref("language", LanguagePreference.allCases)
+    }
 
     static let minShortcutCount = 1
     static let maxShortcutCount = 9
@@ -181,10 +309,6 @@ class Preferences {
         UserDefaults.standard.register(defaults: defaultValues)
     }
 
-    static func markSettingsWindowShownOnFirstLaunch() {
-        set("settingsWindowShownOnFirstLaunch", "true", false)
-    }
-
     static func defaultShortcut(_ keyEquivalent: String) -> [String: Any] {
         shortcutStorage(shortcutFromKeyEquivalent(keyEquivalent), keyEquivalent)
     }
@@ -193,7 +317,9 @@ class Preferences {
         setShortcut(key, shortcut, stringRepresentation: nil, notify)
     }
 
-    static func setShortcut(_ key: String, _ shortcut: Shortcut?, stringRepresentation: String?, _ notify: Bool = true) {
+    static func setShortcut(
+        _ key: String, _ shortcut: Shortcut?, stringRepresentation: String?, _ notify: Bool = true
+    ) {
         UserDefaults.standard.set(shortcutStorage(shortcut, stringRepresentation), forKey: key)
         CachedUserDefaults.removeFromCache(key)
         invalidateAllCache()
@@ -203,7 +329,9 @@ class Preferences {
     }
 
     static func setShortcut(_ key: String, keyEquivalent: String, _ notify: Bool = true) {
-        setShortcut(key, shortcutFromKeyEquivalent(keyEquivalent), stringRepresentation: keyEquivalent, notify)
+        setShortcut(
+            key, shortcutFromKeyEquivalent(keyEquivalent), stringRepresentation: keyEquivalent,
+            notify)
     }
 
     static func shortcut(_ key: String) -> Shortcut? {
@@ -277,27 +405,6 @@ class Preferences {
         all[indexToName(baseName, index)] != nil
     }
 
-    /// Remove an override (the user "unlinks" it from the global). For the 3 Pro-gated overrides on
-    /// shortcut 0, also clear the remembered Pro index in `ProTransitionState` — otherwise an
-    /// unrelated unlock pass would re-create the override from that snapshot.
-    static func removeOverride(_ baseName: String, _ index: Int) {
-        remove(indexToName(baseName, index))
-        if index == 0, let rememberedKey = overrideRememberedKey(baseName) {
-            ProTransitionState.setInt(rememberedKey, nil)
-        }
-    }
-
-    /// Maps the 3 Pro-gated index-0 override base names to their remembered-key in `ProTransitionState`.
-    /// Returns nil for the 2 non-gated overrides and for index >= 1.
-    private static func overrideRememberedKey(_ baseName: String) -> String? {
-        switch baseName {
-        case "appearanceStyleOverride": return ProGatedPreferences.appearanceStyleOverride0.gate?.rememberedKey
-        case "appearanceSizeOverride": return ProGatedPreferences.appearanceSizeOverride0.gate?.rememberedKey
-        case "shortcutStyleOverride": return ProGatedPreferences.shortcutStyleOverride0.gate?.rememberedKey
-        default: return nil
-        }
-    }
-
     /// Indices (0..shortcutCount) whose stored override value differs from the current global.
     /// Used to render "Overridden in Shortcut: 1, 3" labels in AppearanceTab.
     static func shortcutIndicesWithDifferentValue(_ baseName: String, globalKey: String) -> [Int] {
@@ -311,29 +418,32 @@ class Preferences {
 
     static func effectiveAppearanceStyle(_ index: Int) -> AppearanceStylePreference {
         guard hasOverride("appearanceStyleOverride", index) else { return appearanceStyle }
-        if index == 0 { return ProGatedPreferences.appearanceStyleOverride0.read() }
-        return CachedUserDefaults.macroPref(indexToName("appearanceStyleOverride", index), AppearanceStylePreference.allCases)
+        return CachedUserDefaults.macroPref(
+            indexToName("appearanceStyleOverride", index), AppearanceStylePreference.allCases)
     }
 
     static func effectiveAppearanceSize(_ index: Int) -> AppearanceSizePreference {
         guard hasOverride("appearanceSizeOverride", index) else { return appearanceSize }
-        if index == 0 { return ProGatedPreferences.appearanceSizeOverride0.read() }
-        return CachedUserDefaults.macroPref(indexToName("appearanceSizeOverride", index), AppearanceSizePreference.allCases)
+        return CachedUserDefaults.macroPref(
+            indexToName("appearanceSizeOverride", index), AppearanceSizePreference.allCases)
     }
 
     static func effectiveAppearanceTheme(_ index: Int) -> AppearanceThemePreference {
         guard hasOverride("appearanceThemeOverride", index) else { return appearanceTheme }
-        return CachedUserDefaults.macroPref(indexToName("appearanceThemeOverride", index), AppearanceThemePreference.allCases)
+        return CachedUserDefaults.macroPref(
+            indexToName("appearanceThemeOverride", index), AppearanceThemePreference.allCases)
     }
 
     static func effectiveShortcutStyle(_ index: Int) -> ShortcutStylePreference {
         guard hasOverride("shortcutStyleOverride", index) else { return shortcutStyle }
-        if index == 0 { return ProGatedPreferences.shortcutStyleOverride0.read() }
-        return CachedUserDefaults.macroPref(indexToName("shortcutStyleOverride", index), ShortcutStylePreference.allCases)
+        return CachedUserDefaults.macroPref(
+            indexToName("shortcutStyleOverride", index), ShortcutStylePreference.allCases)
     }
 
     static func effectivePreviewSelectedWindow(_ index: Int) -> Bool {
-        guard hasOverride("previewFocusedWindowOverride", index) else { return previewSelectedWindow }
+        guard hasOverride("previewFocusedWindowOverride", index) else {
+            return previewSelectedWindow
+        }
         return CachedUserDefaults.bool(indexToName("previewFocusedWindowOverride", index))
     }
 
@@ -348,7 +458,8 @@ class Preferences {
     /// thumbnail). When neither is configured, stored images would never be shown, so all capture work
     /// is skipped and no image RAM is held.
     static var anyShortcutShowsWindowCaptures: Bool {
-        anyShortcutUsesPreview || (0...maxShortcutCount).contains { effectiveAppearanceStyle($0) == .thumbnails }
+        anyShortcutUsesPreview
+            || (0...maxShortcutCount).contains { effectiveAppearanceStyle($0) == .thumbnails }
     }
 
     /// Which Screen-Recording-dependent features any shortcut's effective settings rely on: the
@@ -366,12 +477,14 @@ class Preferences {
             usesPreviews = usesPreviews || effectivePreviewSelectedWindow(index)
             if usesThumbnails && usesPreviews { break }
         }
-        return PermissionCalloutResolver.dependentFeatures(usesThumbnails: usesThumbnails, usesPreviews: usesPreviews)
+        return PermissionCalloutResolver.dependentFeatures(
+            usesThumbnails: usesThumbnails, usesPreviews: usesPreviews)
     }
 
     /// key-above-tab is ` on US keyboard, but can be different on other keyboards
     static func keyAboveTabDependingOnInputSource() -> String {
-        return LiteralKeyCodeTransformer.shared.transformedValue(NSNumber(value: kVK_ANSI_Grave)) ?? "`"
+        return LiteralKeyCodeTransformer.shared.transformedValue(NSNumber(value: kVK_ANSI_Grave))
+            ?? "`"
     }
 
     static func returnKeyEquivalent() -> String {
@@ -380,18 +493,33 @@ class Preferences {
 
     static func defaultExceptions() -> String {
         return jsonEncode([
-            ExceptionEntry(bundleIdentifier: "com.apple.finder", hide: .whenNoOpenWindow, ignore: .none),
-            ExceptionEntry(bundleIdentifier: "com.apple.ScreenSharing", hide: .none, ignore: .whenFullscreen),
-            ExceptionEntry(bundleIdentifier: "com.microsoft.rdc.macos", hide: .none, ignore: .whenFullscreen),
-            ExceptionEntry(bundleIdentifier: "com.teamviewer.TeamViewer", hide: .none, ignore: .whenFullscreen),
-            ExceptionEntry(bundleIdentifier: "org.virtualbox.app.VirtualBoxVM", hide: .none, ignore: .whenFullscreen),
-            ExceptionEntry(bundleIdentifier: "com.parallels.", hide: .none, ignore: .whenFullscreen),
-            ExceptionEntry(bundleIdentifier: "com.citrix.XenAppViewer", hide: .none, ignore: .whenFullscreen),
-            ExceptionEntry(bundleIdentifier: "com.citrix.receiver.icaviewer.mac", hide: .none, ignore: .whenFullscreen),
-            ExceptionEntry(bundleIdentifier: "com.nicesoftware.dcvviewer", hide: .none, ignore: .whenFullscreen),
-            ExceptionEntry(bundleIdentifier: "com.vmware.fusion", hide: .none, ignore: .whenFullscreen),
-            ExceptionEntry(bundleIdentifier: "com.utmapp.UTM", hide: .none, ignore: .whenFullscreen),
-            ExceptionEntry(bundleIdentifier: "com.McAfee.McAfeeSafariHost", hide: .always, ignore: .none),
+            ExceptionEntry(
+                bundleIdentifier: "com.apple.finder", hide: .whenNoOpenWindow, ignore: .none),
+            ExceptionEntry(
+                bundleIdentifier: "com.apple.ScreenSharing", hide: .none, ignore: .whenFullscreen),
+            ExceptionEntry(
+                bundleIdentifier: "com.microsoft.rdc.macos", hide: .none, ignore: .whenFullscreen),
+            ExceptionEntry(
+                bundleIdentifier: "com.teamviewer.TeamViewer", hide: .none, ignore: .whenFullscreen),
+            ExceptionEntry(
+                bundleIdentifier: "org.virtualbox.app.VirtualBoxVM", hide: .none,
+                ignore: .whenFullscreen),
+            ExceptionEntry(
+                bundleIdentifier: "com.parallels.", hide: .none, ignore: .whenFullscreen),
+            ExceptionEntry(
+                bundleIdentifier: "com.citrix.XenAppViewer", hide: .none, ignore: .whenFullscreen),
+            ExceptionEntry(
+                bundleIdentifier: "com.citrix.receiver.icaviewer.mac", hide: .none,
+                ignore: .whenFullscreen),
+            ExceptionEntry(
+                bundleIdentifier: "com.nicesoftware.dcvviewer", hide: .none, ignore: .whenFullscreen
+            ),
+            ExceptionEntry(
+                bundleIdentifier: "com.vmware.fusion", hide: .none, ignore: .whenFullscreen),
+            ExceptionEntry(
+                bundleIdentifier: "com.utmapp.UTM", hide: .none, ignore: .whenFullscreen),
+            ExceptionEntry(
+                bundleIdentifier: "com.McAfee.McAfeeSafariHost", hide: .always, ignore: .none),
         ])
     }
 
@@ -400,18 +528,24 @@ class Preferences {
     }
 
     static func archiveShortcut(_ shortcut: Shortcut?) -> Data {
-        try! NSKeyedArchiver.archivedData(withRootObject: shortcut ?? emptyShortcut, requiringSecureCoding: true)
+        try! NSKeyedArchiver.archivedData(
+            withRootObject: shortcut ?? emptyShortcut, requiringSecureCoding: true)
     }
 
-    static func shortcutStorage(_ shortcut: Shortcut?, _ stringRepresentation: String?) -> [String: Any] {
+    static func shortcutStorage(_ shortcut: Shortcut?, _ stringRepresentation: String?) -> [String:
+        Any]
+    {
         [
-            shortcutStorageStringField: stringRepresentation ?? shortcut?.readableStringRepresentation(isASCII: true) ?? "",
+            shortcutStorageStringField: stringRepresentation ?? shortcut?
+                .readableStringRepresentation(isASCII: true) ?? "",
             shortcutStorageDataField: archiveShortcut(shortcut),
         ]
     }
 
     static func decodeShortcutStorage(_ value: Any) -> (Bool, Shortcut?) {
-        guard let storage = value as? [String: Any], let data = storage[shortcutStorageDataField] as? Data else { return (false, nil) }
+        guard let storage = value as? [String: Any],
+            let data = storage[shortcutStorageDataField] as? Data
+        else { return (false, nil) }
         return unarchiveShortcut(data)
     }
 
@@ -452,7 +586,7 @@ class CachedUserDefaults {
     }
 
     /// retrieve strings in the globalDomain (e.g. defaults read -g KeyRepeat)
-    /// these may be nil since we they don't have default values from AltTab
+    /// these may be nil since we they don't have default values from Switchy
     static func globalString(_ key: String) -> String? {
         if let cached = cache.withLock({ $0[key] }) {
             return cached as? String
@@ -543,7 +677,10 @@ struct ExceptionEntry: Codable {
     var ignore: ExceptionIgnorePreference
     var windowTitleContains: [String]?
 
-    init(bundleIdentifier: String, hide: ExceptionHidePreference, ignore: ExceptionIgnorePreference, windowTitleContains: [String]? = nil) {
+    init(
+        bundleIdentifier: String, hide: ExceptionHidePreference, ignore: ExceptionIgnorePreference,
+        windowTitleContains: [String]? = nil
+    ) {
         self.bundleIdentifier = bundleIdentifier
         self.hide = hide
         self.ignore = ignore
@@ -561,7 +698,9 @@ struct ExceptionEntry: Codable {
         self.ignore = try c.decode(ExceptionIgnorePreference.self, forKey: .ignore)
         if let array = try? c.decode([String].self, forKey: .windowTitleContains) {
             self.windowTitleContains = array.isEmpty ? nil : array
-        } else if let string = try? c.decode(String.self, forKey: .windowTitleContains), !string.isEmpty {
+        } else if let string = try? c.decode(String.self, forKey: .windowTitleContains),
+            !string.isEmpty
+        {
             self.windowTitleContains = [string]
         } else {
             self.windowTitleContains = nil

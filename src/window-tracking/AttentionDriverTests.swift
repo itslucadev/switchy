@@ -135,8 +135,8 @@ final class AttentionDriverTests: XCTestCase {
         XCTAssertEqual(outcome.wid, 9)
     }
 
-    /// AltTab's own switch names the window it is switching to.
-    func testAnActivationCarryingAnAltTabTargetFrontsIt() {
+    /// Switchy's own switch names the window it is switching to.
+    func testAnActivationCarryingASwitchyTargetFrontsIt() {
         var driver = AttentionDriver()
         let outcome = driver.decide(.appActivated(pid: pid, now: 0, altTabTargetWid: 4), context: context())
         XCTAssertEqual(outcome.wid, 4)
@@ -165,7 +165,7 @@ final class AttentionDriverTests: XCTestCase {
 
     // MARK: process generations
 
-    /// An app already running when AltTab started must not answer as a stale generation.
+    /// An app already running when Switchy started must not answer as a stale generation.
     func testUnseenPidIsRegisteredBeforeItsEvent() {
         var driver = AttentionDriver()
         let outcome = driver.decide(.altTabFocusedWindowInFrontmostApp(wid: 2, pid: pid, now: 0),

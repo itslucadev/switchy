@@ -432,7 +432,7 @@ final class RealWorldScenariosTests: XCTestCase {
         // carries a link, because the title path can't make one — every tab is titled "~" and they sit at
         // four DIFFERENT cascade positions, so `positionsCompatible` rejects each candidate. Geometry was the
         // only path left and it never even formed a cluster: `framePartitions` split the four tabs into four
-        // partitions of one. So AltTab held 4 windows, 0 groups, and hid 3 of them as phantoms — with "Group
+        // partitions of one. So Switchy held 4 windows, 0 groups, and hid 3 of them as phantoms — with "Group
         // tabs: separate window for each tab" the user saw 1 tile instead of 4.
         //
         // The visible's own AXTabGroup says "4 tabs" and there are exactly 4 same-size candidates. That

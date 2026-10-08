@@ -37,7 +37,7 @@ class Logger {
     /// There used to be one: `--tab-diag`, a parallel `TABDIAG` stream bypassing `minLevel`, on the theory
     /// that tab diagnostics had to be isolated from the `--logs=debug` firehose. It cost more than it
     /// bought. A reporter running `--logs=debug` got the firehose and NONE of the tab decisions, which is
-    /// the worst pairing available; and `open --args` drops arguments when AltTab is already running, so
+    /// the worst pairing available; and `open --args` drops arguments when Switchy is already running, so
     /// "relaunch with --tab-diag" silently produced a capture that merely looked complete (#5785) — which is
     /// why the Debug window force-enabled the flag anyway. The firehose was one line (every raw WindowServer
     /// notification); that line is now gated instead, and there is one channel.

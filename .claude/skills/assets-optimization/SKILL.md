@@ -1,13 +1,13 @@
 ---
 name: assets-optimization
-description: Audit and optimize every image asset shipped with AltTab. Apply the right format per asset class (PDF for vectors, HEIC for raster) and the right post-processing (strip Figma cruft from PDFs, extract SF Symbols as minimal vector PDFs, encode raster sources to HEIC at q50 with visual review). Use whenever new assets are added, when the bundle size needs shrinking, or whenever you want a full assets audit.
+description: Audit and optimize every image asset shipped with Switchy. Apply the right format per asset class (PDF for vectors, HEIC for raster) and the right post-processing (strip Figma cruft from PDFs, extract SF Symbols as minimal vector PDFs, encode raster sources to HEIC at q50 with visual review). Use whenever new assets are added, when the bundle size needs shrinking, or whenever you want a full assets audit.
 ---
 
-# /assets-optimization — AltTab asset audit and optimization
+# /assets-optimization — Switchy asset audit and optimization
 
 ## Goal
 
-Every byte that ships in `AltTab.app/Contents/Resources/` should justify itself. Vectors stay vector, rasters compress to HEIC, and neither carries metadata, color profiles, accessibility tags, or producer signatures that AppKit doesn't use.
+Every byte that ships in `Switchy.app/Contents/Resources/` should justify itself. Vectors stay vector, rasters compress to HEIC, and neither carries metadata, color profiles, accessibility tags, or producer signatures that AppKit doesn't use.
 
 This skill applies a known-good pipeline to each asset class. It is opinionated about the right format and the right encoder for each kind of content.
 
@@ -27,7 +27,7 @@ find resources -type f \( -iname '*.pdf' -o -iname '*.png' -o -iname '*.jpg' -o 
   -exec ls -la {} \; | awk '{printf "%8d  %s\n", $5, $9}' | sort -k2
 ```
 
-Group what you see by directory. For AltTab the relevant buckets are:
+Group what you see by directory. For Switchy the relevant buckets are:
 
 - `resources/icons/menubar/` — small template icons shown in the macOS menubar.
 - `resources/icons/tabs/` — Preferences sidebar icons (template, sized ~13pt).
@@ -84,9 +84,9 @@ Open the PNGs in Preview to confirm nothing visual changed.
 
 ## Step 3: SF Symbols via font subset
 
-Every SF Symbol shipped in AltTab — switcher status icons, sidebar tab icons, button icons, permission/feedback icons — is rendered as a text glyph from a subsetted SF Pro Text font. There are no SF-Symbol PDFs in the bundle.
+Every SF Symbol shipped in Switchy — switcher status icons, sidebar tab icons, button icons, permission/feedback icons — is rendered as a text glyph from a subsetted SF Pro Text font. There are no SF-Symbol PDFs in the bundle.
 
-How it works: SF Symbols are glyphs in the Private Use Area of SF Pro Text. Apple's `SF-Pro-Text-Regular.otf` contains every symbol they've ever shipped. We subset it down to just the codepoints AltTab needs (currently ~36 glyphs, ~17 KB) into `resources/SF-Pro-Text-Regular.otf`, and register it via `Info.plist:ATSApplicationFontsPath = ""`. At runtime, `NSFont(name: "SF Pro Text", size:)` resolves to the bundled subset on macOS <11 (where the system font isn't installed) and to the system font on macOS 11+, with identical glyph appearance either way.
+How it works: SF Symbols are glyphs in the Private Use Area of SF Pro Text. Apple's `SF-Pro-Text-Regular.otf` contains every symbol they've ever shipped. We subset it down to just the codepoints Switchy needs (currently ~36 glyphs, ~17 KB) into `resources/SF-Pro-Text-Regular.otf`, and register it via `Info.plist:ATSApplicationFontsPath = ""`. At runtime, `NSFont(name: "SF Pro Text", size:)` resolves to the bundled subset on macOS <11 (where the system font isn't installed) and to the system font on macOS 11+, with identical glyph appearance either way.
 
 To add a new SF Symbol:
 
@@ -120,7 +120,7 @@ Pipeline (built-in to macOS via `sips`):
 sips -Z 1000 -s format heic -s formatOptions 50 input.png --out output.heic
 ```
 
-- `-Z 1000` resizes the longest edge to 1000px **preserving aspect ratio**. AltTab's illustration display is 500pt wide, so 1000px is the correct @2x ship size. Anything larger wastes bytes; anything smaller looks soft on Retina.
+- `-Z 1000` resizes the longest edge to 1000px **preserving aspect ratio**. Switchy's illustration display is 500pt wide, so 1000px is the correct @2x ship size. Anything larger wastes bytes; anything smaller looks soft on Retina.
 - `formatOptions 50` is the quality. q50 was chosen after a side-by-side comparison at q20/q35/q50/q65/q80 — q50 was the lowest setting where text in screenshots stayed legible and gradient backgrounds didn't band.
 
 Use the script for batch conversion:
@@ -151,11 +151,11 @@ If anything looks degraded, bump quality to q60 or q65 and re-batch. The user, n
 
 ### Bumping quality
 
-If q50 isn't acceptable, the next quality steps are q60 and q65 — beyond that, returns diminish quickly. q80 is the previous default in this repo and roughly 2× the bytes of q50 for no visible improvement on AltTab's content.
+If q50 isn't acceptable, the next quality steps are q60 and q65 — beyond that, returns diminish quickly. q80 is the previous default in this repo and roughly 2× the bytes of q50 for no visible improvement on Switchy's content.
 
 ## Step 5: pbxproj registration
 
-Whenever you change the file extension of a resource (.jpg → .heic, .png → .pdf, etc.), update [alt-tab-macos.xcodeproj/project.pbxproj](alt-tab-macos.xcodeproj/project.pbxproj). The places that need patching:
+Whenever you change the file extension of a resource (.jpg → .heic, .png → .pdf, etc.), update [switchy.xcodeproj/project.pbxproj](switchy.xcodeproj/project.pbxproj). The places that need patching:
 
 1. **PBXBuildFile section** — comment + the comment inside `fileRef = ... /* name.ext */`.
 2. **PBXFileReference section** — comment, `lastKnownFileType` (e.g. `image.pdf`, `image.heic`, `image.png`), and `path = "name.ext"`.

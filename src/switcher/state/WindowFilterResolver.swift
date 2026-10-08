@@ -20,7 +20,7 @@ enum WindowFilterResolver {
                            hideMinimized: Bool = false,          // showMinimizedWindows == .hide
                            onlyVisibleSpaces: Bool = false,      // spacesToShow == .visible
                            onlyNonVisibleSpaces: Bool = false,   // spacesToShow == .nonVisible
-                           onlyPreferredScreen: Bool = false,    // screensToShow == .showingAltTab
+                           onlyPreferredScreen: Bool = false,    // screensToShow == .showingSwitchy
                            separateTabs: Bool = false,           // groupTabs == .separateWindows
                            frontmostPid: pid_t? = nil,
                            visibleSpaceIds: [UInt64] = [],       // CGSSpaceID === UInt64

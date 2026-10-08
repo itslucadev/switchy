@@ -13,9 +13,9 @@ echo "
       <title>Version $version</title>
       <pubDate>$date</pubDate>
       <sparkle:minimumSystemVersion>$minimumSystemVersion</sparkle:minimumSystemVersion>
-      <sparkle:releaseNotesLink>https://alt-tab.app/changelog-bare</sparkle:releaseNotesLink>
+      <sparkle:releaseNotesLink>https://github.com/itslucadev/switchy/changelog-bare</sparkle:releaseNotesLink>
       <enclosure
-        url=\"https://github.com/lwouis/alt-tab-macos/releases/download/v$version/$zipName\"
+        url=\"https://github.com/itslucadev/switchy/releases/download/v$version/$zipName\"
         sparkle:version=\"$version\"
         sparkle:shortVersionString=\"$version\"
         $edSignatureAndLength

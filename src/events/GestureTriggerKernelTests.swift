@@ -1,7 +1,7 @@
 import XCTest
 
 /// Pins `GestureTriggerKernel` and `GestureTracker`, the decision extracted from `TrackpadEvents` for
-/// #5137 ("the trackpad gesture stops working until AltTab is relaunched"). Pure value types in,
+/// #5137 ("the trackpad gesture stops working until Switchy is relaunched"). Pure value types in,
 /// `Outcome` out — no trackpad, no taps, no globals; `TrackpadEvents` is the adapter that maps
 /// `NSTouch` into these frames.
 ///
@@ -104,7 +104,7 @@ final class GestureTriggerKernelTests: XCTestCase {
     }
 
     /// The regression guard. Raising the fingers ends the gesture, and the cancelled swipe must not
-    /// outlive it: this is what used to kill gestures until AltTab was relaunched, because
+    /// outlive it: this is what used to kill gestures until Switchy was relaunched, because
     /// `swipeStillPossible` gates its own recomputation and nothing on this path cleared it.
     func testCancelledSwipeDoesNotSurviveTheFingersBeingRaised() {
         let kernel = GestureTriggerKernel()

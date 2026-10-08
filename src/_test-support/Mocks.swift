@@ -1,30 +1,29 @@
 import Cocoa
 import ShortcutRecorder
 
-// Stubs so ProBadgeView.swift compiles in the test target. The real Symbols
-// enum and NSImage.fromSymbol live in TileFontIconView.swift and
-// HelperExtensions.swift respectively, neither of which is in the test
-// target's source membership. Tests never actually render an icon, so a
-// minimal stub satisfying the signatures is enough — isTemplate = true
-// matches the production contract that ProBadgeViewSegmentTests asserts on.
-enum Symbols: String {
-    case stub = ""
-}
-
-extension NSImage {
-    static func fromSymbol(_ symbol: Symbols, pointSize: CGFloat, rotated180: Bool = false) -> NSImage {
-        let image = NSImage()
-        image.isTemplate = true
-        return image
-    }
-}
-
 // Stub so SwitcherSession.swift's Preview-frame cache compiles in the test target. The real enum
-// lives in LightImageView.swift (not in the test target); the session only stores and returns
-// values, so mirroring the cases without the helper methods is enough.
+// lives in LightImageView.swift (not in the test target). `byteSize` mirrors production
+// (`bytesPerRow * height` / `CVPixelBufferGetDataSize`, nil → 0); `.stub` lets tests name a
+// size without allocating a backing store.
 enum CALayerContents {
     case cgImage(CGImage?)
     case pixelBuffer(CVPixelBuffer?)
+    case stub(byteSize: UInt64)
+
+    var byteSize: UInt64 {
+        switch self {
+        case .cgImage(let image):
+            guard let image, image.bytesPerRow > 0, image.height > 0 else { return 0 }
+            let (bytes, overflow) = UInt64(image.bytesPerRow).multipliedReportingOverflow(
+                by: UInt64(image.height))
+            return overflow ? UInt64.max : bytes
+        case .pixelBuffer(let pixelBuffer):
+            guard let pixelBuffer else { return 0 }
+            return UInt64(CVPixelBufferGetDataSize(pixelBuffer))
+        case .stub(let byteSize):
+            return byteSize
+        }
+    }
 }
 
 // Test-target reimplementation of `SettingsSearchIndex`'s inline-registration API. The production
@@ -109,7 +108,9 @@ extension NSColor {
 
 extension NSView {
     func addOrUpdateConstraint(_ anchor: NSLayoutDimension, _ constant: CGFloat) {
-        if let constraint = (constraints.first { $0.firstAnchor == anchor && $0.secondAnchor == nil }) {
+        if let constraint =
+            (constraints.first { $0.firstAnchor == anchor && $0.secondAnchor == nil })
+        {
             constraint.constant = constant
         } else {
             anchor.constraint(equalToConstant: constant).isActive = true
@@ -138,7 +139,7 @@ class App {
         var tilesPanel = TilesPanelMock()
     }
     static let app = AppMock()
-    static let bundleIdentifier = "com.lwouis.alt-tab-macos"
+    static let bundleIdentifier = "app.lucabecker.switchy"
 }
 
 class TilesPanel {
@@ -172,27 +173,40 @@ class ControlsTab {
     //    them COMBINED with their hold (⌥⇥, ⌥`).
     static let defaultShortcuts = [
         "holdShortcut": ATShortcut(Shortcut(keyEquivalent: "⌥")!, "holdShortcut", .global, .up, 0),
-        "holdShortcut2": ATShortcut(Shortcut(keyEquivalent: "⌥")!, "holdShortcut2", .global, .up, 1),
-        "holdShortcut3": ATShortcut(Shortcut(keyEquivalent: "⌥")!, "holdShortcut3", .global, .up, 2),
-        "nextWindowShortcut": ATShortcut(Shortcut(keyEquivalent: "⇥")!, "nextWindowShortcut", .global, .down),
-        "nextWindowShortcut2": ATShortcut(Shortcut(keyEquivalent: "`")!, "nextWindowShortcut2", .global, .down),
+        "holdShortcut2": ATShortcut(
+            Shortcut(keyEquivalent: "⌥")!, "holdShortcut2", .global, .up, 1),
+        "holdShortcut3": ATShortcut(
+            Shortcut(keyEquivalent: "⌥")!, "holdShortcut3", .global, .up, 2),
+        "nextWindowShortcut": ATShortcut(
+            Shortcut(keyEquivalent: "⇥")!, "nextWindowShortcut", .global, .down),
+        "nextWindowShortcut2": ATShortcut(
+            Shortcut(keyEquivalent: "`")!, "nextWindowShortcut2", .global, .down),
         "→": ATShortcut(Shortcut(keyEquivalent: "→")!, "→", .local, .down),
         "←": ATShortcut(Shortcut(keyEquivalent: "←")!, "←", .local, .down),
         "↑": ATShortcut(Shortcut(keyEquivalent: "↑")!, "↑", .local, .down),
         "↓": ATShortcut(Shortcut(keyEquivalent: "↓")!, "↓", .local, .down),
-//        "vimCycleRight": ATShortcut(Shortcut(keyEquivalent: "l")!, "vimCycleRight", .local, .down),
-//        "vimCycleLeft": ATShortcut(Shortcut(keyEquivalent: "h")!, "vimCycleLeft", .local, .down),
-//        "vimCycleUp": ATShortcut(Shortcut(keyEquivalent: "k")!, "vimCycleUp", .local, .down),
-//        "vimCycleDown": ATShortcut(Shortcut(keyEquivalent: "j")!, "vimCycleDown", .local, .down),
-        "focusWindowShortcut": ATShortcut(Shortcut(keyEquivalent: " ")!, "focusWindowShortcut", .local, .down),
-        "previousWindowShortcut": ATShortcut(Shortcut(keyEquivalent: "⇧")!, "previousWindowShortcut", .local, .down),
-        "cancelShortcut": ATShortcut(Shortcut(keyEquivalent: "⎋")!, "cancelShortcut", .local, .down),
-        "searchShortcut": ATShortcut(Shortcut(keyEquivalent: "s")!, "searchShortcut", .local, .down),
-        "closeWindowShortcut": ATShortcut(Shortcut(keyEquivalent: "w")!, "closeWindowShortcut", .local, .down),
-        "minDeminWindowShortcut": ATShortcut(Shortcut(keyEquivalent: "m")!, "minDeminWindowShortcut", .local, .down),
-        "toggleFullscreenWindowShortcut": ATShortcut(Shortcut(keyEquivalent: "f")!, "toggleFullscreenWindowShortcut", .local, .down),
-        "quitAppShortcut": ATShortcut(Shortcut(keyEquivalent: "q")!, "quitAppShortcut", .local, .down),
-        "hideShowAppShortcut": ATShortcut(Shortcut(keyEquivalent: "h")!, "hideShowAppShortcut", .local, .down),
+        //        "vimCycleRight": ATShortcut(Shortcut(keyEquivalent: "l")!, "vimCycleRight", .local, .down),
+        //        "vimCycleLeft": ATShortcut(Shortcut(keyEquivalent: "h")!, "vimCycleLeft", .local, .down),
+        //        "vimCycleUp": ATShortcut(Shortcut(keyEquivalent: "k")!, "vimCycleUp", .local, .down),
+        //        "vimCycleDown": ATShortcut(Shortcut(keyEquivalent: "j")!, "vimCycleDown", .local, .down),
+        "focusWindowShortcut": ATShortcut(
+            Shortcut(keyEquivalent: " ")!, "focusWindowShortcut", .local, .down),
+        "previousWindowShortcut": ATShortcut(
+            Shortcut(keyEquivalent: "⇧")!, "previousWindowShortcut", .local, .down),
+        "cancelShortcut": ATShortcut(
+            Shortcut(keyEquivalent: "⎋")!, "cancelShortcut", .local, .down),
+        "searchShortcut": ATShortcut(
+            Shortcut(keyEquivalent: "s")!, "searchShortcut", .local, .down),
+        "closeWindowShortcut": ATShortcut(
+            Shortcut(keyEquivalent: "w")!, "closeWindowShortcut", .local, .down),
+        "minDeminWindowShortcut": ATShortcut(
+            Shortcut(keyEquivalent: "m")!, "minDeminWindowShortcut", .local, .down),
+        "toggleFullscreenWindowShortcut": ATShortcut(
+            Shortcut(keyEquivalent: "f")!, "toggleFullscreenWindowShortcut", .local, .down),
+        "quitAppShortcut": ATShortcut(
+            Shortcut(keyEquivalent: "q")!, "quitAppShortcut", .local, .down),
+        "hideShowAppShortcut": ATShortcut(
+            Shortcut(keyEquivalent: "h")!, "hideShowAppShortcut", .local, .down),
     ]
     static var shortcuts = defaultShortcuts
 
@@ -202,11 +216,13 @@ class ControlsTab {
             SwitcherSession.current = nil
         }
         if action.starts(with: "nextWindowShortcut") {
-            let session = SwitcherSession.current ?? {
-                let new = SwitcherSession()
-                SwitcherSession.current = new
-                return new
-            }()
+            let session =
+                SwitcherSession.current
+                ?? {
+                    let new = SwitcherSession()
+                    SwitcherSession.current = new
+                    return new
+                }()
             session.shortcutIndex = Preferences.nameToIndex(action)
         }
     }
@@ -226,10 +242,22 @@ class KeyRepeatTimer {
 }
 
 class Logger {
-    static func debug(_ message: @escaping () -> Any?, file: String = #file, function: String = #function, line: Int = #line, context: Any? = nil) {}
-    static func info(_ message: @escaping () -> Any?, file: String = #file, function: String = #function, line: Int = #line, context: Any? = nil) {}
-    static func warning(_ message: @escaping () -> Any?, file: String = #file, function: String = #function, line: Int = #line, context: Any? = nil) {}
-    static func error(_ message: @escaping () -> Any?, file: String = #file, function: String = #function, line: Int = #line, context: Any? = nil) {}
+    static func debug(
+        _ message: @escaping () -> Any?, file: String = #file, function: String = #function,
+        line: Int = #line, context: Any? = nil
+    ) {}
+    static func info(
+        _ message: @escaping () -> Any?, file: String = #file, function: String = #function,
+        line: Int = #line, context: Any? = nil
+    ) {}
+    static func warning(
+        _ message: @escaping () -> Any?, file: String = #file, function: String = #function,
+        line: Int = #line, context: Any? = nil
+    ) {}
+    static func error(
+        _ message: @escaping () -> Any?, file: String = #file, function: String = #function,
+        line: Int = #line, context: Any? = nil
+    ) {}
 }
 
 class Preferences {

@@ -25,6 +25,9 @@ different value writes/updates the override; and the *only* way to unset an over
 - A malformed stored override (non-Int string) is treated as "displayed = -1", so a click still writes
   (corrupt defaults don't silently turn every click into a no-op).
 - `nil` stored value with no override falls back to the global as the displayed value.
+- The link button removes only the indexed override preference through the normal preference-removal
+  path. The control then follows the current global value; cache invalidation and change notifications
+  remain unchanged.
 
 ## Test scenarios
 

@@ -122,3 +122,14 @@ Mirrors `SearchTests.swift` 1:1.
 The renderer consumes `SWResult`; `MatchResult.toSWResult()` converts the kernel's output, deriving similarity = score/1200 and dropping the unused `ops` field.
 - **testToSWResultBridgesMatchResultFields** — score, span, subspans copy verbatim; similarity = score/1200; ops cleared.
 - **testToSWResultScalesSimilarityProportionally** — similarity scales linearly with score (600 → 0.5).
+
+### Performance benchmark
+One prepared query ("chrone" — a typo that misses tiers 1–5, so Damerau-Levenshtein runs for most
+titles) is scored against every app name and title of a deterministic 2,304-title fixture
+(12 apps × 12 kinds × 4 separators × 4 suffixes, with emoji, camelCase, diacritics and numbers).
+The metric is seconds per full scoring pass — the per-keystroke work `Windows.sort` pays — with the
+fixture and prepared query built outside the measured block and the checksum/match-count validated
+against an unmeasured reference pass afterwards.
+- **testBenchmarkFullSearchPassOnThousandTitles** — measures one full fuzzy-search pass over the
+  1,000+-title fixture with a single prepared query; asserts pass count ≥ 1,000, ≥ 1 fuzzy match,
+  and post-measure checksum/match-count equality with the reference pass.

@@ -126,7 +126,7 @@ final class TestScenarioSimulator {
     /// it settles onto is decided when it fires).
     private var settling = [Int]()
 
-    /// `preexisting` is the COLD-START condition: windows that already existed when AltTab launched, seeded
+    /// `preexisting` is the COLD-START condition: windows that already existed when Switchy launched, seeded
     /// into the world without emitting a single event. Every other scenario starts from nothing and watches
     /// every window from birth, which is the one condition under which any history-based detector looks
     /// perfect — the real world hands us a Finder window that has had six tabs since before we were running.
@@ -145,7 +145,7 @@ final class TestScenarioSimulator {
         s.visibleSpaces = [model.windowedSpace]
         s.currentSpaceId = model.windowedSpace
         s.spaceIndexById = [model.windowedSpace: 1]
-        // A pre-existing fullscreen window's Space is part of the topology AltTab reads at launch, even
+        // A pre-existing fullscreen window's Space is part of the topology Switchy reads at launch, even
         // though no transition of ours ever created it.
         for w in model.world where w.isFullscreen { s.spaceIndexById[w.space] = 2 }
         runner = TestReducerRunner(initial: s)
@@ -197,7 +197,7 @@ final class TestScenarioSimulator {
     /// the group's tile disappeared for ~800ms mid-switch; rec24e: ~1s). Deliberately weaker than the
     /// end-of-run property: it does NOT demand that the ACTIVE tab be the one shown, because mid-switch the
     /// outgoing tab is legitimately held as the visible one — it demands only that SOME tile stands for the
-    /// window. A window AltTab has never tracked doesn't count (it can't show what it hasn't discovered), nor
+    /// window. A window Switchy has never tracked doesn't count (it can't show what it hasn't discovered), nor
     /// does one the OS is currently moving between Spaces.
     private func checkNothingVanished() {
         guard vanishFailures.isEmpty else { return }

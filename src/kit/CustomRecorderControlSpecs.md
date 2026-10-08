@@ -7,14 +7,14 @@
 When the user records a shortcut in Settings, `CustomRecorderControlTestable.isShortcutAcceptable`
 decides whether the recorded combination is allowed. It rejects unusable or conflicting combinations
 before they're persisted, so the user can't bind something that won't work or that collides with an
-existing AltTab shortcut or a macOS-reserved one.
+existing Switchy shortcut or a macOS-reserved one.
 
 ## Behavior & edge cases
 
 - A normal key+modifier combo is **accepted**.
 - A "modifiers only" recording is rejected — *unless* it actually carries a keycode (the
   modifiers-only-but-contains-keycode case is accepted).
-- A combo that **conflicts** with an already-bound AltTab shortcut is rejected.
+- A combo that **conflicts** with an already-bound Switchy shortcut is rejected.
 - A press (`nextWindowShortcut`) candidate is checked against the local shortcuts (arrow keys, vim
   keys, statics like Space) combined with its **own** hold — not just the other shortcuts' holds.
   A press edit replaces only the press, so the same-index hold's combinations stay in the "old"

@@ -3,7 +3,7 @@
 Regenerate docs/readme/main.svg, the consolidated SVG that drives README.md.
 
 The README is a single dark, on-brand image (hero + stats + CTAs + screenshot)
-that hands GitHub visitors off to https://alt-tab.app/. To stay seamless across
+that hands GitHub visitors off to https://github.com/itslucadev/switchy/. To stay seamless across
 GitHub light & dark themes, every visible element is baked into one SVG —
 including the hero screenshot, embedded as a base64 JPG.
 
@@ -58,7 +58,7 @@ def build_svg(screenshot_b64: str) -> str:
     """
     Build the SVG. Layout (y coordinates inside a 900x1040 viewBox):
        50 - 194 : icon (144x144, vertically centered with the title+tagline stack)
-      120       : "AltTab Pro" title baseline
+      120       : "Switchy" title baseline
       158       : tagline baseline
       220 - 360 : stats container (deco 140x140 with number + label inside)
       365 - 421 : CTA #1
@@ -66,7 +66,6 @@ def build_svg(screenshot_b64: str) -> str:
       950 - 1006: CTA #2
 
     Gradients (matching the website's _buttons.scss exactly):
-      - Pro badge: 36deg, 60px period, animated 8s (one full horizontal period)
       - CTA pill : 36deg, 150px period, animated 14s (one full horizontal period)
 
     Stat values (7.4M, 15K) are placeholders — they sit behind XML comment
@@ -93,18 +92,6 @@ def build_svg(screenshot_b64: str) -> str:
       <stop offset="0%" stop-color="#8F47EB" stop-opacity="0.08"/>
       <stop offset="100%" stop-color="#0a0a1a" stop-opacity="0"/>
     </radialGradient>
-
-    <linearGradient id="proGrad"
-      x1="0" y1="48.541" x2="35.267" y2="0"
-      gradientUnits="userSpaceOnUse"
-      spreadMethod="repeat">
-      <stop offset="0" stop-color="#FF4488"/>
-      <stop offset="0.333" stop-color="#4488ff"/>
-      <stop offset="0.667" stop-color="#66CCFF"/>
-      <stop offset="1" stop-color="#FF4488"/>
-      <animateTransform attributeName="gradientTransform" type="translate"
-        values="0,0; -102.107,0" dur="8s" repeatCount="indefinite"/>
-    </linearGradient>
 
     <linearGradient id="ctaGrad"
       x1="0" y1="121.353" x2="88.167" y2="0"
@@ -180,7 +167,7 @@ def build_svg(screenshot_b64: str) -> str:
     </svg>
   </g>
 
-  <text x="330" y="120" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="700" font-size="56" fill="#ffffff" letter-spacing="-1.5">AltTab <tspan fill="url(#proGrad)">Pro</tspan></text>
+  <text x="330" y="120" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="700" font-size="56" fill="#ffffff" letter-spacing="-1.5">Switchy</text>
 
   <text x="330" y="158" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="400" font-size="22" fill="#8888a8">See every window. Switch in an instant.</text>
 
@@ -241,14 +228,14 @@ def build_svg(screenshot_b64: str) -> str:
 
   <g transform="translate(372 365)">
     <rect width="156" height="56" rx="28" fill="url(#ctaGrad)"/>
-    <text x="78" y="36" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="700" font-size="22" fill="#ffffff" filter="url(#ctaShadow)">Get AltTab</text>
+    <text x="78" y="36" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="700" font-size="22" fill="#ffffff" filter="url(#ctaShadow)">Get Switchy</text>
   </g>
 
   <image href="data:image/jpeg;base64,{screenshot_b64}" x="40" y="455" width="820" height="461" clip-path="url(#screenshotClip)" preserveAspectRatio="xMidYMid slice"/>
 
   <g transform="translate(372 950)">
     <rect width="156" height="56" rx="28" fill="url(#ctaGrad)"/>
-    <text x="78" y="36" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="700" font-size="22" fill="#ffffff" filter="url(#ctaShadow)">Get AltTab</text>
+    <text x="78" y="36" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="700" font-size="22" fill="#ffffff" filter="url(#ctaShadow)">Get Switchy</text>
   </g>
 </svg>
 '''

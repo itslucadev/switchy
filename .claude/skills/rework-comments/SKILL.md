@@ -1,6 +1,6 @@
 ---
 name: rework-comments
-description: Audit and rework code comments across AltTab so they help an AI agent instead of misleading it. Triages every comment by whether its claim is verifiable and non-derivable, deletes process narration and repeated lessons, shrinks history to test names, and flags comments that have drifted out of sync with the code. Use for a whole-codebase pass, for one file or folder that feels over-commented, after a big refactor, or whenever an agent has been misled by a comment.
+description: Audit and rework code comments across Switchy so they help an AI agent instead of misleading it. Triages every comment by whether its claim is verifiable and non-derivable, deletes process narration and repeated lessons, shrinks history to test names, and flags comments that have drifted out of sync with the code. Use for a whole-codebase pass, for one file or folder that feels over-commented, after a big refactor, or whenever an agent has been misled by a comment.
 ---
 
 # /rework-comments

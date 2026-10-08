@@ -17,8 +17,8 @@ enum OrderSortType: Equatable { case recentlyFocused, recentlyCreated, alphabeti
 struct OrderWindow: Equatable {
     let state: WindowState
     let app: ApplicationState
-    let searchMatches: Bool       // Search.matches (only meaningful when search is active)
-    let searchRelevance: Double   // Search.relevance
+    let searchMatches: Bool       // Search.result.matches (only meaningful when search is active)
+    let searchRelevance: Double   // Search.result.relevance
 }
 
 struct ApplicationRepresentativeCandidate: Equatable {

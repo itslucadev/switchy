@@ -97,7 +97,7 @@ class FeedbackWindow: NSWindow {
         appIcon.updateContents(.cgImage(App.appIcon(for: appIconSize)), appIconSize)
         appIcon.fit(64, 64)
 
-        let subtitle = NSTextField(labelWithString: NSLocalizedString("Help improve AltTab", comment: ""))
+        let subtitle = NSTextField(labelWithString: NSLocalizedString("Help improve Switchy", comment: ""))
         subtitle.textColor = .secondaryLabelColor
         let headerText = StackView([
             BoldLabel(NSLocalizedString("Send feedback", comment: "")),
@@ -236,7 +236,7 @@ class FeedbackWindow: NSWindow {
     private func showUpdateAvailableAlert(item: SUAppcastItem) {
         let alert = NSAlert()
         alert.alertStyle = .informational
-        alert.messageText = NSLocalizedString("A new version of AltTab is available", comment: "")
+        alert.messageText = NSLocalizedString("A new version of Switchy is available", comment: "")
         let format = NSLocalizedString(
             "You're running v%1$@. v%2$@ is available. The bug you're seeing may already be fixed — please update first and check before reporting.",
             comment: "")
@@ -440,7 +440,7 @@ class FeedbackWindow: NSWindow {
     /// The backend owns the final GitHub issue presentation — we just hand it the raw
     /// pieces. Splitting `body` from `debugProfile` means the markdown layout (quoting,
     /// `<details>` wrapping, disclaimer) can change server-side without forcing every
-    /// installed AltTab to update.
+    /// installed Switchy to update.
     private func prepareRequest() -> URLRequest {
         var request = URLRequest(url: URL(string: Endpoints.feedbackUrl)!)
         request.httpMethod = "POST"

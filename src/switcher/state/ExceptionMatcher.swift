@@ -22,7 +22,7 @@ enum ShortcutExceptionContextResolver {
 
 /// Matches windows/apps against the user's exception rules. Two independent, pure questions:
 ///   • `hidesWindow` — should this window be hidden from the switcher? (the exception's `hide` rule)
-///   • `disablesShortcuts` — should AltTab's global shortcuts be turned off while this app is
+///   • `disablesShortcuts` — should Switchy's global shortcuts be turned off while this app is
 ///     frontmost? (the exception's `ignore` rule)
 /// Both share a **bundle-id prefix gate**: an exception applies iff its `bundleIdentifier` is non-empty
 /// and the app's bundle id has it as a prefix. Operates on canonical `WindowState` / `ApplicationState`

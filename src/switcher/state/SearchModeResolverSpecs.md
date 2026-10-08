@@ -26,16 +26,13 @@ the Edit menu, call `App.cycleSelection`).
 - **Escape is contextual** (the headline interaction): if search was *toggled mid-session*, Escape
   exits search back to the normal switcher (a second Escape then closes it). If the session *started
   in search*, Escape closes the whole switcher immediately — there's no "normal switcher" to fall back to.
-- **Pro gating timing**: `ProFeature.searchInSwitcher.attemptUse()` has side effects (consume the free
-  pass, surface the upgrade UI), so the *caller* evaluates it at the real attempt moment and passes a
-  `Bool` in. The gate is checked **before** the state branches, so a denied attempt never mutates mode
-  (it returns `.proGateBlocked`). `toggle` is gate-free — it just routes to the enter/disable path,
-  which applies its own gate (mirrors the original delegation).
 - **Entering editing refreshes the UI** (`enterEditing` is only reached from `.off`).
+- **Re-entering editing only places the caret**: it does not change session state, clear hover, stop
+  key-repeat timers, or refresh the UI. Both entry paths place the caret after any required UI refresh.
 - **Key routing precedence** (while editing): IME-composing or an open context menu wins first (never
   steal composing keystrokes) → arrows drive selection → Tab is swallowed → a matched when-active
   shortcut passes to the shortcut pipeline → everything else (typed text, **cmd+A/C/V/X**) goes to the
-  `NSSearchField`, which handles select-all/copy/paste/cut natively. AltTab does not intercept those.
+  `NSSearchField`, which handles select-all/copy/paste/cut natively. Switchy does not intercept those.
 - **Any when-active shortcut works in editing via hold+key** (`editingShortcutMatch`, #5781 generalized):
   in search you release the activation modifiers to type, so a when-active shortcut bound to a bare
   printable key (e.g. the default `closeWindow = W`, `quitApp = Q`) must not steal the keystroke — you
@@ -73,10 +70,9 @@ Mirrors `SearchModeResolverTests.swift` 1:1.
 - **testToggleFromOffEntersEditing** — `.off` → `.enterEditing`.
 - **testToggleFromEditingDisables** — `.editing` → `.disable`.
 
-### C. Enter editing (Pro-gated)
-- **testEnterFromOffEntersEditing** — `.off` + entitled → `.enterEditing`.
-- **testEnterWhenAlreadyEditingJustPlacesCaret** — `.editing` + entitled → `placeCaretOnly`.
-- **testEnterBlockedWhenSearchNotEntitled** — not entitled (gate checked before state branch) → `.proGateBlocked`.
+### C. Enter editing
+- **testEnterFromOffEntersEditing** — `.off` → `.enterEditing`.
+- **testEnterWhenAlreadyEditingJustPlacesCaret** — `.editing` → `placeCaretOnly`.
 
 ### D. Disable
 - **testDisableFromEditingExitsToOff** — `.editing` → `.exitToOff`.

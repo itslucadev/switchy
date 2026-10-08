@@ -1,13 +1,13 @@
 ---
 name: coverage-explore
-description: Measure AltTab test coverage and record it as documentation. Runs the Test scheme with coverage into a throwaway result bundle, parses the per-file/region report, refreshes the per-feature badge atop each `*Specs.md` and the root `src/coverage.md` table, then suggests the highest-value missing tests. These two markdown outputs are the ONLY stored coverage — no lcov/html/xcresult is kept, and routine test runs don't gather coverage. Use to refresh coverage docs, find untested kernel branches, or decide what to test next.
+description: Measure Switchy test coverage and record it as documentation. Runs the Test scheme with coverage into a throwaway result bundle, parses the per-file/region report, refreshes the per-feature badge atop each `*Specs.md` and the root `src/coverage.md` table, then suggests the highest-value missing tests. These two markdown outputs are the ONLY stored coverage — no lcov/html/xcresult is kept, and routine test runs don't gather coverage. Use to refresh coverage docs, find untested kernel branches, or decide what to test next.
 ---
 
 # /coverage-explore
 
 ## Project context
 
-AltTab follows the **Humble Object** pattern: logic lives in dependency-free **decision kernels**
+Switchy follows the **Humble Object** pattern: logic lives in dependency-free **decision kernels**
 (`SelectionResolver.swift`, `SearchModeResolver.swift`, the `*Testable.swift` files) compiled into the
 `unit-tests` target and tested in isolation; the AppKit layer (windows, views, event taps) is kept thin
 and is deliberately *not* unit-tested. So coverage is meaningful **per kernel / per feature-source** —
@@ -28,7 +28,7 @@ There is intentionally **nothing else**: no lcov, no HTML, no committed `.xcresu
    ```sh
    rm -rf /tmp/altcov.xcresult
    set -o pipefail && xcodebuild test \
-     -project alt-tab-macos.xcodeproj -scheme Test -configuration Release \
+     -project switchy.xcodeproj -scheme Test -configuration Release \
      -enableCodeCoverage YES -resultBundlePath /tmp/altcov.xcresult | scripts/xcbeautify
    ```
    If the build is red, stop and report — coverage on a failing suite is meaningless.

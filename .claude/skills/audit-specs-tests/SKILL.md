@@ -1,13 +1,13 @@
 ---
 name: audit-specs-tests
-description: Audit the AltTab test suite for spec/test/code consistency. For every co-located triad in `src/` (`Foo.swift` + `FooSpecs.md` + `FooTests.swift`), it cross-checks that each XCTest method has a matching scenario line in the spec and vice-versa, flags drift between a scenario's description and the test's doc-comment, and reports orphan tests, orphan scenarios, and unpaired files. Use after adding or editing any `*Tests.swift` / `*Specs.md`, before committing a test change, or to get an overall health check of the suite.
+description: Audit the Switchy test suite for spec/test/code consistency. For every co-located triad in `src/` (`Foo.swift` + `FooSpecs.md` + `FooTests.swift`), it cross-checks that each XCTest method has a matching scenario line in the spec and vice-versa, flags drift between a scenario's description and the test's doc-comment, and reports orphan tests, orphan scenarios, and unpaired files. Use after adding or editing any `*Tests.swift` / `*Specs.md`, before committing a test change, or to get an overall health check of the suite.
 ---
 
 # /audit-specs-tests
 
 ## Project context
 
-AltTab co-locates tests and a living spec next to the source they cover. The convention (see the plan in `.claude/plans/` and `src/pro/license/` as a worked example) is a **triad** per concept:
+Switchy co-locates tests and a living spec next to the source they cover. The convention (see the plan in `.claude/plans/` and `src/pro/license/` as a worked example) is a **triad** per concept:
 
 ```
 src/<feature>/

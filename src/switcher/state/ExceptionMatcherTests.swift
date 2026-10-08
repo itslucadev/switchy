@@ -1,7 +1,7 @@
 import XCTest
 
 /// Pins the per-app exception matching: whether a window is hidden from the switcher (`hide` rule)
-/// and whether AltTab's shortcuts are disabled while an app is frontmost (`ignore` rule). Operates
+/// and whether Switchy's shortcuts are disabled while an app is frontmost (`ignore` rule). Operates
 /// on canonical `WindowState` / `ApplicationState` records — no `Window`/`Application` references.
 ///
 /// Groups: A per-exception hide rule · B hidesWindow (gate + hide) · C disablesShortcuts (gate + ignore).

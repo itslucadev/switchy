@@ -254,11 +254,21 @@ class Window {
         return WindowElementAcquisition.element(for: wid, pid: application.pid, route: .otherSpaceViaBruteForce)
     }
 
+    func adoptThumbnail(_ contents: CALayerContents?) {
+        thumbnail = contents
+        guard let wid = cgWindowId else { return }
+        if let contents {
+            WindowThumbnails.dropThumbnails(WindowThumbnails.thumbnailBudget.store(wid, bytes: contents.byteSize, protecting: WindowThumbnails.protectingWids()))
+        } else {
+            WindowThumbnails.thumbnailBudget.forget(wid)
+        }
+    }
+
     func refreshThumbnail(_ screenshot: CALayerContents) {
         // a frame the OS drew mid-animation is much smaller than this window: keep the previous thumbnail,
         // stale but correct, while another capture is asked for (`WindowThumbnails.acceptCapture`)
         guard WindowThumbnails.acceptCapture(self, screenshot) else { return }
-        thumbnail = screenshot
+        adoptThumbnail(screenshot)
         if !SwitcherSession.isActive || !shouldShowTheUser { return }
         if let position = self.position, let size = self.size,
            let view = (TilesView.recycledViews.first { $0.window_?.cgWindowId == cgWindowId }) {
@@ -391,7 +401,7 @@ class Window {
             // undoing the raise while the window stayed key (#5586, the Slack-after-sleep variant).
             // AltTab knows exactly which window it is focusing — record it so the coming app activation
             // bumps this window directly instead of divining the focus from a racy 808 / AX read (#5596).
-            WindowServerEvents.noteAltTabInitiatedFocus(cgWindowId!, application.pid)
+            WindowServerEvents.noteSwitchyInitiatedFocus(cgWindowId!, application.pid)
             Windows.promoteAttentionEvidence(cgWindowId!)
             let targetMaybeCrossSpace = !self.spaceIds.isEmpty && !self.spaceIds.contains(originSpaceId)
             let originFrontPid = targetMaybeCrossSpace

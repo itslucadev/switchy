@@ -1,5 +1,5 @@
-import XCTest
 import Cocoa
+import XCTest
 
 final class OnActionExtensionTests: XCTestCase {
 
@@ -13,7 +13,8 @@ final class OnActionExtensionTests: XCTestCase {
     func testGetterReturnsClosureAfterSet() {
         let control = NSControl()
         control.onAction = { _ in }
-        XCTAssertNotNil(control.onAction,
+        XCTAssertNotNil(
+            control.onAction,
             "regression: getter must return the stored closure so wrap patterns can chain")
     }
 
@@ -60,9 +61,12 @@ final class OnActionExtensionTests: XCTestCase {
         // AppKit's real call site is `[target performSelector:action with:sender]`. Using
         // perform(_:with:) here matches what the runtime does, going through SelectorWrapper.
         _ = control.target?.perform(control.action!, with: control)
-        XCTAssertEqual(calls, 1,
-            "SelectorWrapper.callClosure must forward the target/action invocation to the stored closure.")
-        XCTAssertTrue(receivedSender === control,
+        XCTAssertEqual(
+            calls, 1,
+            "SelectorWrapper.callClosure must forward the target/action invocation to the stored closure."
+        )
+        XCTAssertTrue(
+            receivedSender === control,
             "The sender forwarded to the closure must be the control AppKit invoked the action on.")
     }
 
@@ -86,8 +90,10 @@ final class OnActionExtensionTests: XCTestCase {
 
         control.onAction = { _ in originalCalls += 1 }
         let original = control.onAction
-        XCTAssertNotNil(original,
-            "regression: without the getter fix, `original` would be nil and the wrap would orphan the underlying action")
+        XCTAssertNotNil(
+            original,
+            "regression: without the getter fix, `original` would be nil and the wrap would orphan the underlying action"
+        )
 
         control.onAction = { c in
             wrapperCalls += 1
@@ -96,12 +102,13 @@ final class OnActionExtensionTests: XCTestCase {
 
         control.onAction?(control)
         XCTAssertEqual(wrapperCalls, 1)
-        XCTAssertEqual(originalCalls, 1,
+        XCTAssertEqual(
+            originalCalls, 1,
             "regression: the wrapper must be able to call through to the previously-set closure")
     }
 
-    /// When the wrap returns early (the Pro-click branch), the original closure must NOT fire —
-    /// otherwise `controlWasChanged` would still write the Pro value to `Preferences`.
+    /// When the wrap returns early (any guard branch), the original closure must NOT fire —
+    /// otherwise the wrap's side effect and the original would both apply.
     func testWrapPatternSkipsPreviousClosureOnEarlyReturn() {
         let control = NSControl()
         var originalCalls = 0
@@ -109,13 +116,14 @@ final class OnActionExtensionTests: XCTestCase {
         let original = control.onAction
 
         control.onAction = { _ in
-            // simulate the "isProLocked + isProSegment" branch: do side effect, return early
+            // simulate a guarded branch: do side effect, return early
             // original?(c) is NOT called here
         }
         _ = original
 
         control.onAction?(control)
-        XCTAssertEqual(originalCalls, 0,
+        XCTAssertEqual(
+            originalCalls, 0,
             "original closure must not fire when the wrap returns early")
     }
 

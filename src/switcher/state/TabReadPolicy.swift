@@ -22,7 +22,7 @@ struct TabReadCandidate: Equatable {
 
 /// **Which windows pay for a tab read on a given switcher show.**
 ///
-/// The tab read is the most expensive thing AltTab asks of other processes. `AXUIElement.tabGroupInfo` hunts
+/// The tab read is the most expensive thing Switchy asks of other processes. `AXUIElement.tabGroupInfo` hunts
 /// for an `AXTabGroup` among a window's DIRECT children, and there is no OS batch across elements, so it
 /// costs one Mach round trip per child — and a window with no tabs pays for every one of them before
 /// concluding there is no tab bar. An ordinary AppKit window has several children (the close/minimize/zoom

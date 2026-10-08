@@ -41,21 +41,35 @@ extension NSControl {
 }
 
 extension CGImage {
+    /// Aspect-fit downscale. Returns `self` (no allocation) when the image already fits, `newSize`
+    /// is not a finite positive size, or the bitmap copy fails, so a thumbnail is never dropped.
     func resizedCopyWithCoreGraphics(_ newSize: NSSize, _ fixBitmapInfo: Bool) -> CGImage {
+        guard let fitted = aspectFitPixelSize(within: newSize),
+              fitted.width < width || fitted.height < height else { return self }
         let finalBitmapInfo = fixBitmapInfo
             ? CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue).union(.byteOrder32Little)
             : bitmapInfo
-        let context = CGContext(data: nil,
-            width: Int(newSize.width),
-            height: Int(newSize.height),
+        guard let context = CGContext(data: nil,
+            width: fitted.width,
+            height: fitted.height,
             bitsPerComponent: bitsPerComponent,
             bytesPerRow: 0,
             space: colorSpace ?? CGColorSpace(name: CGColorSpace.sRGB)!,
             bitmapInfo: finalBitmapInfo.rawValue
-        )!
+        ) else { return self }
         context.interpolationQuality = .high
-        context.draw(self, in: CGRect(origin: .zero, size: newSize))
-        return context.makeImage()!
+        context.draw(self, in: CGRect(x: 0, y: 0, width: fitted.width, height: fitted.height))
+        return context.makeImage() ?? self
+    }
+
+    private func aspectFitPixelSize(within maxSize: NSSize) -> (width: Int, height: Int)? {
+        guard maxSize.width.isFinite, maxSize.height.isFinite, maxSize.width >= 1, maxSize.height >= 1,
+              width > 0, height > 0 else { return nil }
+        let scale = min(1.0, maxSize.width / CGFloat(width), maxSize.height / CGFloat(height))
+        let fittedWidth = Int((CGFloat(width) * scale).rounded())
+        let fittedHeight = Int((CGFloat(height) * scale).rounded())
+        guard fittedWidth > 0, fittedHeight > 0 else { return nil }
+        return (fittedWidth, fittedHeight)
     }
 }
 

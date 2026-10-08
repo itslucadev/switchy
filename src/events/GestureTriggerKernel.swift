@@ -83,9 +83,9 @@ class GestureTracker {
 }
 
 /// Pure state machine for the trackpad gesture *trigger*: the decision, taken while the switcher is
-/// NOT open, of whether the fingers on the trackpad just performed AltTab's summon swipe.
+/// NOT open, of whether the fingers on the trackpad just performed Switchy's summon swipe.
 ///
-/// Extracted from `TrackpadEvents` because #5137 ("the gesture stops working until AltTab is
+/// Extracted from `TrackpadEvents` because #5137 ("the gesture stops working until Switchy is
 /// relaunched") was a reset-path bug in here, of a kind no live QA pass can catch: the trigger has
 /// state that outlives a gesture, and two pieces of it could keep a value that made every later
 /// swipe fail. `TrackpadEvents` stays the adapter — event taps, `NSTouch` mapping, haptics, showing
@@ -151,7 +151,7 @@ final class GestureTriggerKernel {
         // At most one finger left: that is pointer mode, not a gesture, so the gesture is over and all
         // of its state goes with it. Clearing only `userHasDoneAnotherGesture` here was #5137 —
         // `swipeStillPossible` gates its own recomputation, so once one swipe wandered off-axis
-        // nothing ever set it back and the trigger stayed dead until AltTab was relaunched. A
+        // nothing ever set it back and the trigger stayed dead until Switchy was relaunched. A
         // 2-finger scroll happened to clear it via the `requiredFingers` mismatch below, which is why
         // the symptom came and went.
         if frame.fingersDown <= 1 {

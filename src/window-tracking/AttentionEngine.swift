@@ -5,7 +5,7 @@ import Cocoa
 ///
 /// Three channels reach it, and they are the only three:
 /// - **the reducer's input stream** (`dispatched`), for an app activation, an answer to the bounded
-///   `kAXFocusedWindow` read, and AltTab's own switch into an app already in front;
+///   `kAXFocusedWindow` read, and Switchy's own switch into an app already in front;
 /// - **the app's own accessibility observer** (`axSemanticFocus`), settled per process;
 /// - **the click channel** (`directedAttention`), the type-13 tap in `WindowAttentionEvents`.
 ///
@@ -94,7 +94,7 @@ class AttentionEngine {
     }
 
     /// The generation the tracking pipeline currently associates with this pid. Lazily assigned, so an app
-    /// that was already running when AltTab started has an identity too.
+    /// that was already running when Switchy started has an identity too.
     static func generation(of pid: pid_t) -> UInt64 {
         let generation = generations[pid] ?? 1
         generations[pid] = generation

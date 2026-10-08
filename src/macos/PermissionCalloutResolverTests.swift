@@ -1,6 +1,6 @@
 import XCTest
 
-/// Pins exactly when the menubar "AltTab is running without Screen Recording permissions" callout
+/// Pins exactly when the menubar "Switchy is running without Screen Recording permissions" callout
 /// shows vs. stays hidden, and which feature(s) it names (see #5623). The callout used to appear
 /// whenever the permission was missing and always blamed Thumbnails; it now only appears when the
 /// permission is missing AND the user's settings actually use it (Thumbnails appearance style or the

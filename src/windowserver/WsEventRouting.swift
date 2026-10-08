@@ -5,7 +5,7 @@ import Cocoa
 /// wide id range, then driving window lifecycle/focus/space changes) — see `WsEventRoutingSpecs.md`. Holds
 /// no state; `WindowServerEvents` turns these decisions into model mutations.
 enum WsEventRouting {
-    /// The WindowServer notifications AltTab acts on (raw ids confirmed live).
+    /// The WindowServer notifications Switchy acts on (raw ids confirmed live).
     enum Notification: UInt32, CaseIterable {
         case windowCreated = 811
         case windowDestroyed = 804

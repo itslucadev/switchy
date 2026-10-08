@@ -157,7 +157,7 @@ closed one window mid-way). Both AXTabGroups were captured from the log: A = ["U
 the durable invariant a between-groups move must preserve: each group's `matchSiblings` resolves ONLY its own
 tabs, never the other group's or the standalones. (Automating the atomic single-tab drag is impractical —
 TextEdit Cmd-T = Show Fonts, a torn-off tab detaches into a new window unless dropped exactly on a tab bar,
-and AltTab's off-screen windows block computer-use drop targets — so it was done by hand and read from the log.)
+and Switchy's off-screen windows block computer-use drop targets — so it was done by hand and read from the log.)
 `textEditGroup6` is a separate real single-group capture (distinct titles, the clean-match contrast to `~`).
 
 ## Event-replay fixtures (`ReplayScenariosTests` — see `TestReducerRunnerSpecs.md`)

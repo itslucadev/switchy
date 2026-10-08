@@ -191,11 +191,11 @@ final class TestScenarioSimulatorTests: XCTestCase {
         assertCorrect(s, duplicateTitles: true, reusesTabWindows: false)
     }
 
-    // MARK: - cold start (AltTab launched into a desktop that already existed)
+    // MARK: - cold start (Switchy launched into a desktop that already existed)
 
     /// Every other scenario in this file starts from nothing and watches every window from birth. That is the
     /// one condition under which a history-based detector cannot fail, because history covers everything —
-    /// and it is not the condition AltTab actually launches in. These seed a world with `preexisting` and
+    /// and it is not the condition Switchy actually launches in. These seed a world with `preexisting` and
     /// emit no event for it: the first `show` is the launch discovery, and the only facts available are the
     /// ones readable NOW (the AXTabGroup, the frames).
     ///

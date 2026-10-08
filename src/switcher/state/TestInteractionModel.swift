@@ -28,7 +28,7 @@ enum TestUserAction: Equatable, CustomStringConvertible {
 
 /// THE model of OS behavior: `[TestUserAction ⇒ OS events]`. It holds GROUND TRUTH — which windows are real,
 /// which are tabs of one window, which tab is active, each window's frame/Space/fullscreen — and for each
-/// action emits the WindowServer/AX event sequence AltTab would observe, as `TestReducerRunner.Step`s. It
+/// action emits the WindowServer/AX event sequence Switchy would observe, as `TestReducerRunner.Step`s. It
 /// performs NOTHING itself: `TestScenarioSimulator` drives the steps through the reducer, which lets the
 /// same action be replayed under different event ORDERINGS (the interleaving fuzz).
 ///
@@ -205,7 +205,7 @@ struct TestInteractionModel {
     /// entire rec24 class.
     private var pendingHoldReleaseWids = [CGWindowID]()
 
-    /// A window that already existed when AltTab started. See `seed`.
+    /// A window that already existed when Switchy started. See `seed`.
     struct PreexistingWindow {
         var pid: pid_t
         var tabs: Int
@@ -224,8 +224,8 @@ struct TestInteractionModel {
         }
     }
 
-    /// Seed a world that AltTab NEVER SAW BEING BUILT — no create, no Space join, no focus, nothing. This is
-    /// the cold start: AltTab launches (or is updated, or is installed mid-session) into a desktop that
+    /// Seed a world that Switchy NEVER SAW BEING BUILT — no create, no Space join, no focus, nothing. This is
+    /// the cold start: Switchy launches (or is updated, or is installed mid-session) into a desktop that
     /// already has a Finder window with six tabs and a fullscreen Terminal.
     ///
     /// It is the initial condition every other scenario lacks, and it is the one that separates the two
@@ -340,7 +340,7 @@ struct TestInteractionModel {
     ///
     /// The restore also ACTIVATES the app. That is ambient state (`appSteps`), not an `appActivated` input:
     /// when the app was already frontmost — the reporter's case — macOS emits nothing else at all, and the
-    /// order-in is the whole of what AltTab hears.
+    /// order-in is the whole of what Switchy hears.
     private mutating func restoreFromDock(window: Int) -> ActionEvents {
         guard let wi = index(ofWindow: window), world[wi].isMinimized else { return ActionEvents() }
         world[wi].isMinimized = false
@@ -545,12 +545,12 @@ struct TestInteractionModel {
         // `Windows.sort()` runs before the tiles are built, so every read below lands against an MRU-ordered
         // list — which is the order the reducer's first-wins rules walk (rec26).
         e.ordered = [.sortByMru]
-        // Which actives AltTab knows about is snapshotted HERE, before any of this show's discoveries land:
+        // Which actives Switchy knows about is snapshotted HERE, before any of this show's discoveries land:
         // every read below is ISSUED now and lands later, in whatever order. Reading tracked-ness as the
         // event list is built instead let the Space re-query name a wid the show itself was still
         // discovering — the group would never look lost, which is precisely the rec24 gap.
         let trackedActives = Set(world.filter { $0.tabs[$0.activeTab].tracked }.map { $0.activeWid })
-        // The wids `syncSpacesState` captures for its per-window backfill: every window AltTab tracks AT THIS
+        // The wids `syncSpacesState` captures for its per-window backfill: every window Switchy tracks AT THIS
         // MOMENT — background tabs and stale wids included, since the app asks about its whole list. Snapshot
         // it here with `trackedActives`, for the same reason: a window this show is still discovering was
         // never asked about, so the answer must say nothing about it (`.spacesSynced`'s `queried`).
@@ -573,7 +573,7 @@ struct TestInteractionModel {
                 pendingHoldReleaseWids = []
             }
         }
-        // brute-force AX adoption of INACTIVE tabs AltTab never tracked (you switched away from a tab before
+        // brute-force AX adoption of INACTIVE tabs Switchy never tracked (you switched away from a tab before
         // it was ever discovered). An inactive tab is in no CGS list, so it arrives Space-LESS, and its own
         // fullscreen flag is false even inside a fullscreen window — its window is frozen at the parent's
         // frame, and the mirror hasn't been stamped yet. `adoptedAsInactiveTab` is the contract that says
@@ -603,13 +603,13 @@ struct TestInteractionModel {
         // buttons and titles, nested one level deeper (`AXWindow/AXGroup/AXTabGroup`). Descending to it was
         // reverted because only SOME
         // apps expose it that way, and modelling an app-dependent read would grade downstream changes against
-        // a world AltTab does not live in. See `tabsReadable` and `AXUIElement.tabGroupInfo`.
+        // a world Switchy does not live in. See `tabsReadable` and `AXUIElement.tabGroupInfo`.
         for w in world where w.tabs.count > 1 && tabsReadable(w) {
             e.readUnits.append([.input(.titleAndTabsRead(wid: w.activeWid, tabTitles: w.tabs.map { $0.title },
                 tabGroupToken: tabGroupToken(w), reconcileTabs: true, changedSoFar: false))])
         }
         // authoritative Space re-query (active tab → its Space; everything else absent)
-        // The map is built from AltTab's TRACKED windows, so an UNTRACKED minted active contributes nothing —
+        // The map is built from Switchy's TRACKED windows, so an UNTRACKED minted active contributes nothing —
         // and neither does its group, whose background tabs CGS lists on no Space and whose outgoing rep just
         // genuinely left. That is why the re-query wiped a whole group mid-switch (rec24): between the minted
         // wid's Space-join and its discovery, the group is invisible to this read.
