@@ -41,7 +41,12 @@ class Appearance {
     private static var currentSize: AppearanceSizePreference { Preferences.effectiveAppearanceSize(SwitcherSession.activeShortcutIndex) }
     static var currentTheme: AppearanceThemePreference {
         let theme = Preferences.effectiveAppearanceTheme(SwitcherSession.activeShortcutIndex)
-        return theme == .system ? NSAppearance.current.getThemeName() : theme
+        guard theme == .system else { return theme }
+        if #available(macOS 11.0, *) {
+            return NSAppearance.currentDrawing().getThemeName()
+        } else {
+            return NSAppearance.current.getThemeName()
+        }
     }
 
     static func update() {

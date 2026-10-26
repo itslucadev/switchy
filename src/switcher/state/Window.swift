@@ -382,8 +382,20 @@ class Window {
             WindowThumbnails.previewSelectedIfNeeded()
         } else if self.isWindowlessApp || cgWindowId == nil {
             if let bundleUrl = application.bundleURL, self.isWindowlessApp {
-                if (try? NSWorkspace.shared.launchApplication(at: bundleUrl, configuration: [:])) == nil {
-                    application.runningApplication.activate(options: .activateAllWindows)
+                if #available(macOS 10.15, *) {
+                    let runningApplication = application.runningApplication
+                    let configuration = NSWorkspace.OpenConfiguration()
+                    configuration.promptsUserIfNeeded = false
+                    NSWorkspace.shared.openApplication(at: bundleUrl, configuration: configuration) { launchedApplication, error in
+                        guard error != nil || launchedApplication == nil else { return }
+                        DispatchQueue.main.async {
+                            runningApplication.activate(options: .activateAllWindows)
+                        }
+                    }
+                } else {
+                    if (try? NSWorkspace.shared.launchApplication(at: bundleUrl, configuration: [:])) == nil {
+                        application.runningApplication.activate(options: .activateAllWindows)
+                    }
                 }
             } else {
                 application.runningApplication.activate(options: .activateAllWindows)

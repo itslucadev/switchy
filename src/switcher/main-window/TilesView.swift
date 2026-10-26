@@ -1,6 +1,7 @@
 import Carbon.HIToolbox.Events
 import Cocoa
 import ShortcutRecorder
+import UniformTypeIdentifiers
 
 enum SearchKeyResult {
  case handled
@@ -846,7 +847,11 @@ class TilesDocumentView: FlippedView {
  override init(frame frameRect: NSRect) {
   super.init(frame: frameRect)
   // we only handle URLs (i.e. not text, image, or other draggable things)
-  registerForDraggedTypes([NSPasteboard.PasteboardType(kUTTypeURL as String)])
+  if #available(macOS 11.0, *) {
+   registerForDraggedTypes([NSPasteboard.PasteboardType(UTType.url.identifier)])
+  } else {
+   registerForDraggedTypes([NSPasteboard.PasteboardType(kUTTypeURL as String)])
+  }
  }
 
  required init?(coder: NSCoder) {
@@ -880,10 +885,28 @@ class TilesDocumentView: FlippedView {
     urlCount: urls.count),
    let appUrl
   else { return false }
-  let open = try? NSWorkspace.shared.open(
-   urls, withApplicationAt: appUrl, options: [], configuration: [:])
-  if open != nil { App.hideUi() }
-  return open != nil
+  if #available(macOS 10.15, *) {
+   let session = SwitcherSession.current
+   NSWorkspace.shared.open(
+    urls, withApplicationAt: appUrl, configuration: NSWorkspace.OpenConfiguration()
+   ) { [weak session] application, error in
+    guard error == nil, application != nil else {
+     Logger.error { error?.localizedDescription ?? "Failed to open dropped URLs" }
+     return
+    }
+    DispatchQueue.main.async { [weak session] in
+     guard let session, session === SwitcherSession.current else { return }
+     App.hideUi()
+    }
+   }
+   // Accept the drop now; opening completes asynchronously and reports errors via NSWorkspace.
+   return true
+  } else {
+   let open = try? NSWorkspace.shared.open(
+    urls, withApplicationAt: appUrl, options: [], configuration: [:])
+   if open != nil { App.hideUi() }
+   return open != nil
+  }
  }
 
  override func concludeDragOperation(_ sender: NSDraggingInfo?) {

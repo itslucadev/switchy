@@ -391,12 +391,13 @@ class SettingsWindow: NSWindow {
   sidebarTableView.headerView = nil
   sidebarTableView.intercellSpacing = NSSize(width: 0, height: 2)
   sidebarTableView.rowHeight = 30
-  sidebarTableView.selectionHighlightStyle = .sourceList
   sidebarTableView.backgroundColor = .clear
   sidebarTableView.focusRingType = .none
   sidebarTableView.usesAlternatingRowBackgroundColors = false
   if #available(macOS 11.0, *) {
    sidebarTableView.style = .sourceList
+  } else {
+   sidebarTableView.selectionHighlightStyle = .sourceList
   }
   sidebarTableView.delegate = self
   sidebarTableView.dataSource = self

@@ -899,7 +899,7 @@ class Applications {
   _ app: Application, _ untrackedTitles: [String], _ requesterWid: CGWindowID
  ) {
   let pid = app.pid
-  tabAdoptThrottler.throttleOrProceed(key: "\(pid)") {
+  tabAdoptThrottler.throttleOrProceed(key: "\(pid)") { [app] in
    let appWindowCount = Windows.list.reduce(0) { $1.application.pid == pid ? $0 + 1 : $0 }
    let situation = "\(untrackedTitles.sorted().joined(separator: "\u{1}"))|\(appWindowCount)"
    let previous = lastInactiveTabScan[pid]

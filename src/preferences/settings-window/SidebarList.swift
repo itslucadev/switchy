@@ -295,10 +295,16 @@ class SidebarListRow: ClickHoverStackView {
         }
         titleLabel.font = NSFont.systemFont(
             ofSize: 13, weight: isSelectedRow ? .semibold : .regular)
-        let previousAppearance = NSAppearance.current
-        NSAppearance.current = effectiveAppearance
-        layer?.backgroundColor = backgroundColor.cgColor
-        NSAppearance.current = previousAppearance
+        if #available(macOS 11.0, *) {
+            effectiveAppearance.performAsCurrentDrawingAppearance {
+                layer?.backgroundColor = backgroundColor.cgColor
+            }
+        } else {
+            let previousAppearance = NSAppearance.current
+            NSAppearance.current = effectiveAppearance
+            layer?.backgroundColor = backgroundColor.cgColor
+            NSAppearance.current = previousAppearance
+        }
         titleLabel.needsDisplay = true
         summaryLabel.needsDisplay = true
         chevronLabel.needsDisplay = true
